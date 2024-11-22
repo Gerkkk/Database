@@ -1,0 +1,5 @@
+cmake-build-debug/*
+.vscode
+input.bin
+output.bin
+#cmake-build-debug-coverage/*
