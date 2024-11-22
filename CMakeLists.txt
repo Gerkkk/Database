@@ -15,8 +15,8 @@ add_executable(main main.cpp
         MEMDB/Preprocessor/Preprocessor.h
         MEMDB/Result/Result.cpp
         MEMDB/Result/Result.h
-#        MathExpression/MathExpression.h
-#        MathExpression/MathExpression.cpp
+        MEMDB/MathExpression/MathExpression.h
+        MEMDB/MathExpression/MathExpression.cpp
         MEMDB/Table/Table.h
         MEMDB/Table/Table.cpp
         MEMDB/Database/Database.h

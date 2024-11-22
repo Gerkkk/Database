@@ -1,11 +1,29 @@
 #include "MathExpression.h"
 
-namespace
-{
-    Int32Factory::Registrar<Int32Factory> reg1("int32");
-}
 
-MathExpression *Int32Factory::get_MathExpression(std::string x) {
-    MathExpression *ret = new Int32(x);
-    return ret;
-}
+//keep priorities like in c++ in case we will add some new operators
+std::map<std::string ,int> SyntaxTree::operations_priority = {
+        {"||", 15},
+        {"&&", 14},
+        {"^^", 12},
+        {"=", 10},
+        {"!=", 10},
+        {">=", 9},
+        {">", 9},
+        {"<=", 9},
+        {"<", 9},
+        {"+", 6},
+        {"-", 6},
+        {"*", 5},
+        {"/", 5},
+        {"%", 5},
+        {"!", 3},
+        {"string", 0},
+        {"int32", 0},
+        {"bin", 0},
+        {"true", 0},
+        {"false", 0},
+        {"module", 0},
+        {"name", 0},
+        {"complex_name", 0},
+};

@@ -84,7 +84,7 @@ PreprocessorResult * Preprocessor::Preprocess() {
         int i = 0;
 
         while (i < cur_query.first.size()) {
-            if (cur_query.first[i] == '\n' || cur_query.first[i] == ' ' || cur_query.first[i] == '(' || cur_query.first[i] == ')') {
+            if (cur_query.first[i] == '\n' || cur_query.first[i] == ' ') {
                 if (!buf.empty()) {
                     TokenFactory T = TokenFactory();
                     Token *r = T.make_token(buf);
@@ -105,6 +105,35 @@ PreprocessorResult * Preprocessor::Preprocess() {
 
                     buf = "";
                 }
+            } else if (cur_query.first[i] == '(' || cur_query.first[i] == ')') {
+                if (!buf.empty()) {
+                    TokenFactory T = TokenFactory();
+                    Token *r = T.make_token(buf);
+                    //std::cout << "! " << buf << std::endl;
+                    if (r != nullptr) {
+                        cur_tokens.push_back(r);
+                    } else {
+                        Token *rr = T.make_name(buf);
+
+                        if (rr != nullptr) {
+                            cur_tokens.push_back(rr);
+                        } else {
+                            this->ok = false;
+                            this->error = "Preprocessor: uknown word " + buf;
+                            break;
+                        }
+                    }
+
+                    buf = "";
+                }
+
+                TokenFactory T = TokenFactory();
+                buf.push_back(cur_query.first[i]);
+                Token *rr = T.make_token(buf);
+                cur_tokens.push_back(rr);
+
+                buf = "";
+
             } else {
                 buf.push_back(cur_query.first[i]);
             }

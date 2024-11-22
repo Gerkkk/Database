@@ -1,38 +1,36 @@
 #include "MEMDB/Database/Database.h"
+#include "MEMDB/MathExpression//MathExpression.h"
 
 using namespace memdb;
 
 int main() {
-    Database db;
-
-    std::shared_ptr<Table> T(new Table("People"));
-    //auto ptr = new Column(arg1, arg2, arg4, arg3);
-    std::shared_ptr<Column> ptr1(new Column("names", "string", "noname", 100, false, false, false, {"Alex", "Bob", "Cris"}));
-    std::shared_ptr<Column> ptr2(new Column("Ages", "int32", "18", 11, false, false, false, {"10", "3", "54"}));
-    std::shared_ptr<Column> ptr3(new Column("id", "int32", "-1", 11, false, false, false, {"1", "2", "3"}));
-    std::shared_ptr<Column> ptr4(new Column("is_student", "bool", "0", 1, false, false, false, {"0", "1", "1"}));
-    T->add_column(ptr1);
-    T->add_column(ptr2);
-    T->add_column(ptr3);
-    T->add_column(ptr4);
-
-    db.add_table(T);
 
     //Insert Query
-    std::string s9 = "insert (\"Danya\", 19, 4, true) to People;";
-    DBResult dbres = db.execute(s9);
-    db.print_database();
+    std::string s9 = "true && !(false) && true;";
+    Preprocessor P = Preprocessor(s9);
 
-    //Select query
-    std::string s10 = "select names, Ages from People where true;";
-    DBResult dbres1 = db.execute(s10);
-    dbres1.data[0].data.print_table();
+    PreprocessorResult *PR = P.Parse();
+    std::cout << PR->is_ok() << " " <<  PR->get_error() << " " << PR->data.size() << std::endl;
+    std::vector<Token *> res = PR->data[0].commands;
+    //std::cout << "ok by now, lol" << std::endl;
+
+    for (auto it : PR->data[0].commands) {
+        std::cout << it->type << " ";
+    }
+    std::cout << std::endl;
+
+    for (auto it : PR->data[0].commands) {
+        std::cout << it->value << " ";
+    }
+    std::cout << std::endl;
+
+    SyntaxTree ST = SyntaxTree(res);
+    //std::cout << "good by now" << std::endl;
+    ST.execute();
+    std::pair<std::string, std::string> output = ST.get_res();
+    std::cout << output.first << " " << output.second << std::endl;
 
 
-    //Delete query
-    std::string s11 = "delete People where true;";
-    db.execute(s11);
-    db.print_database();
 
     return 0;
 }
