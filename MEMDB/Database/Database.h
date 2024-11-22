@@ -6,6 +6,7 @@
 #include "../Preprocessor/Preprocessor.h"
 #include "../Token/Token.h"
 #include "../Table/Table.h"
+#include "../MathExpression/MathExpression.h"
 
 namespace memdb {
     class Database {
@@ -190,6 +191,8 @@ namespace memdb {
                     err = "Wrong structure of Select query. Expected word \"where\".";
                 }
 
+                i++;
+
                 for (; i < s.size(); i++) {
                     conditions.push_back(s[i]);
                 }
@@ -197,6 +200,7 @@ namespace memdb {
             }
 
             QueryResult *execute () override {
+                SyntaxTree st = SyntaxTree(conditions);
                 auto res = new QueryResult;
 
                 if (!is_ok) {
@@ -213,6 +217,7 @@ namespace memdb {
                     auto table = db->tables[source->value];
 
                     std::map<std::string, std::list<std::string>::iterator> columns_map;
+                    std::map<std::string, std::string> column_types;
                     for(auto it : columns) {
                         col_names.push_back(it->value);
                         auto pr_col = table->columns[it->value];
@@ -225,17 +230,32 @@ namespace memdb {
 
                     for(auto it : table->col_names) {
                         columns_map[it] = table->columns[it]->data.begin();
+                        column_types[it] = table->columns[it]->type;
                     }
 
                     int counter = 0;
 
+                    std::map<std::string, std::map<std::string, std::string>> ct = {make_pair(table->name, column_types)};
+                    std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> cv = {make_pair(table->name, columns_map)};
                     while (counter < table->size) {
                         //add math expression checker
-                        for (auto it : columns_map) {
-                            if(std::find(col_names.begin(), col_names.end(), it.first) != col_names.end()) {
-                                res->data.columns[it.first]->data.push_back(*it.second);
+                        st.execute(ct, cv);
+                        std::pair<std::string, std::string> st_res = st.get_res();
+
+                        //std::cout << st_res.first << " " << st_res.second << std::endl;
+                        if (st_res.first == "bool" && st_res.second == "true") {
+                            for (auto it : columns_map) {
+                                if(std::find(col_names.begin(), col_names.end(), it.first) != col_names.end()) {
+                                    res->data.columns[it.first]->data.push_back(*it.second);
+                                }
+                                columns_map[it.first]++;
+                                cv[table->name][it.first]++;
                             }
-                            columns_map[it.first]++;
+                        } else {
+                            for (auto it : columns_map) {
+                                columns_map[it.first]++;
+                                cv[table->name][it.first]++;
+                            }
                         }
 
                         counter++;

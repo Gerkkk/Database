@@ -3,6 +3,7 @@
 #include "../Token/Token.h"
 #include <vector>
 #include <string>
+#include <list>
 
 class SyntaxTreeNode {
 public:
@@ -18,13 +19,13 @@ public:
         right_son = nullptr;
     }
 
-    void execute() {
+    void execute(std::map<std::string, std::map<std::string, std::string>> &column_types, std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values) {
         if (left_son) {
-            left_son->execute();
+            left_son->execute(column_types, column_values);
         }
 
         if(right_son) {
-            right_son->execute();
+            right_son->execute(column_types, column_values);
         }
 
         //cringy ifs
@@ -264,6 +265,23 @@ public:
                     exit(-1);
                 }
             }
+        } else if (type == "name") {
+            if(column_types.size() > 1) {
+                std::cout << "There is more than one table in expression. Use the name of the table in addition to name of the column" << std::endl;
+                exit(-1);
+            } else if (column_types.size() == 0) {
+                std::cout << "Not enough tables for execute" << std::endl;
+                exit(-1);
+            } else {
+                if ((*column_types.begin()).second.find(value) != (*column_types.begin()).second.end()) {
+                    ret_type = (*column_types.begin()).second[value];
+                } else {
+                    std::cout << "No column with name " << value << " in table " << (*column_types.begin()).first << std::endl;
+                    exit(-1);
+                }
+
+                ret_value = (*(*column_values.begin()).second[value]);
+            }
         }
 
         //std::cout << "NODE: " << type << " " << value << " Result: " << ret_type << " " << ret_value << std::endl;
@@ -281,8 +299,8 @@ public:
         head = build_tree(source);
     }
 
-    void execute() {
-        head->execute();
+    void execute(std::map<std::string, std::map<std::string, std::string>> &column_types, std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values) {
+        head->execute(column_types, column_values);
     };
 
     //type, value
