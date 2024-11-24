@@ -59,17 +59,19 @@ Token::Token(std::string type, std::string value) {
 
 Token * TokenFactory::make_name(std::string &x) {
     std::string ret_type, ret_val;
-    if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*[,:]?)"))) {
+    if (std::regex_match(x, std::regex(R"([\s]*[s][t][r][i][n][g][0-9]*\[[0-9]+\][,:]?)"))
+        || std::regex_match(x, std::regex(R"([\s]*[i][n][t][3][2])"))
+           || std::regex_match(x, std::regex(R"([\s]*[b][o][o][l])")) ) {
+        ret_type = "type_name";
+        ret_val = x;
+    } else if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*[,:]?)"))) {
         ret_type = "name";
         ret_val = x;
-    } else if (std::regex_match(x, std::regex(R"([\s]*[,:])"))) {
+    } else if (x == "," || std::regex_match(x, std::regex(R"([\s]*[,][\s]*)"))) {
         ret_type = "empty_name";
         ret_val = x;
     } else if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*.[a-zA-Z_]+[0-9]*[,:]?)") )) {
         ret_type = "complex_name";
-        ret_val = x;
-    } else if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*\[[0-9]+\][,:]?)"))) {
-        ret_type = "type_name";
         ret_val = x;
     }
 
@@ -85,7 +87,7 @@ Token * TokenFactory::make_name(std::string &x) {
 
     ret_val = ret_val.substr(ll, rr - ll + 1);
 
-    if (ret_val.empty()) {
+    if (ret_type.empty()) {
         return nullptr;
     } else {
         auto ret = new Token(ret_type, ret_val);
