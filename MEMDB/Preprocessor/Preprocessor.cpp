@@ -141,6 +141,7 @@ PreprocessorResult * Preprocessor::Preprocess() {
             i++;
         }
 
+        //std::cout << i << std::endl;
         if(!buf.empty()) {
             TokenFactory T = TokenFactory();
             Token *r = T.make_token(buf);
