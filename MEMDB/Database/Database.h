@@ -9,6 +9,8 @@
 #include "../Table/Table.h"
 #include "../MathExpression/MathExpression.h"
 
+#include <ctime>
+
 namespace memdb {
     class Database {
     public:
@@ -27,9 +29,17 @@ namespace memdb {
 
          DBResult execute(std::string &query) {
              auto db_res = new DBResult();
+
+
              Preprocessor P = Preprocessor(query);
+             //const std::clock_t c_start = std::clock();
              PreprocessorResult *p_res = P.Parse();
+
+             //const std::clock_t c_1 = std::clock();
+             //std::cout  << "Before execution " << 1000 * (c_1 - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
              std::vector<QueryResult> prom_res;
+
+
 
              if (!p_res->is_ok()) {
                  db_res->ok = false;
@@ -38,6 +48,7 @@ namespace memdb {
              }  else {
                  for (auto it : p_res->data) {
                      QueryResult *qr;
+
                      if (it.commands[0]->type == "select") {
                          SelectQuery sel = SelectQuery(this, it.commands, true);
                          qr = sel.execute();
@@ -95,7 +106,7 @@ namespace memdb {
             std::string err;
 
 
-            InsertQuery(Database *db, std::vector<Token *> s, bool need) : Query(db) {
+            InsertQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
                 is_ok = true;
 
                 bool end_val = false;
@@ -185,7 +196,7 @@ namespace memdb {
             std::string err;
 
 
-            SelectQuery(Database *db, std::vector<Token *> s, bool need) : Query(db) {
+            SelectQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
                 is_ok = true;
 
                 bool from_val = false;
@@ -272,6 +283,7 @@ namespace memdb {
 //                        std::cout << *cv["People"]["names"] << std::endl;
 //                        std::cout << st_res.first << " " << st_res.second << std::endl;
                         if (st_res.first == "bool" && st_res.second == "true") {
+                            res->data.size++;
                             for (auto it : columns_map) {
                                 if(std::find(col_names.begin(), col_names.end(), it.first) != col_names.end()) {
                                     res->data.columns[it.first]->data.push_back(*it.second);
@@ -303,10 +315,8 @@ namespace memdb {
 
             std::string err;
 
-
-            DeleteQuery(Database *db, std::vector<Token *> s, bool need) : Query(db) {
+            DeleteQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
                 is_ok = true;
-
 
                 int i = 1;
 
@@ -373,6 +383,7 @@ namespace memdb {
                     std::map<std::string, std::map<std::string, std::string>> ct = {make_pair(table->name, column_types)};
                     std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> cv = {make_pair(table->name, columns_map)};
 
+                    int delta = 0;
                     while (counter < table->size) {
 //                        for (auto it : columns_map) {
 //                            //add condition for delete
@@ -387,21 +398,23 @@ namespace memdb {
 
 //                        std::cout << *cv["People"]["names"] << std::endl;
 //                        std::cout << st_res.first << " " << st_res.second << std::endl;
+
                         if (st_res.first == "bool" && st_res.second == "true") {
                             for (auto it : columns_map) {
                                 columns_map[it.first] = table->columns[it.first]->data.erase(it.second);
                                 cv[table->name][it.first] = columns_map[it.first];
                             }
-                            table->size--;
+                            delta++;
                         } else {
                             for (auto it : columns_map) {
                                 columns_map[it.first]++;
                                 cv[table->name][it.first]++;
                             }
                         }
-
                         counter++;
                     }
+
+                    table->size -= delta;
                 }
                 return res;
             }
@@ -430,7 +443,7 @@ namespace memdb {
             std::vector<Column_description> new_columns;
 
 
-            CreateQuery(Database *db, std::vector<Token *> s, bool need) : Query(db) {
+            CreateQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
                 is_ok = true;
 
 //                for (auto it : s) {
@@ -575,7 +588,7 @@ namespace memdb {
             std::vector<assignment> assignments;
 
 
-            UpdateQuery(Database *db, std::vector<Token *> s, bool need) : Query(db) {
+            UpdateQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
                 is_ok = true;
 
 //                for (auto it : s) {

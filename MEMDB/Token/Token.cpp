@@ -4,53 +4,122 @@
 TokenFactory::TokenFactory(){
     tokens = {
             //Math symbols
-            {R"([\s]*[:])", ":"},
-            {R"([\s]*[+])", "+"},
-            {R"([\s]*[-])", "-"},
-            {R"([\s]*[*])", "*"},
-            {R"([\s]*[/])", "/"},
-            {R"([\s]*[%])", "%"},
-            {R"([\s]*[<])", "<"},
-            {R"([\s]*[>])", ">"},
-            {R"([\s]*[=])", "="},
-            {R"([\s]*[<][=])", "<="},
-            {R"([\s]*[>][=])", ">="},
-            {R"([\s]*[!][=])", "!="},
-            {R"([\s]*[&][&])", "&&"},
-            {R"([\s]*[|][|])", "||"},
-            {R"([\s]*[!])", "!"},
-            {R"([\s]*[\^][\^])", "^^"},
-            {R"([\s]*[(])", "("},
-            {R"([\s]*[)])", ")"},
-            {R"([\s]*[|][A-Za-z]*[|])", "module"},
-            //Syntax
-            {R"([\s]*[{])", "{"},
-            {R"([\s]*[}])", "}"},
-            {R"([\s]*[Ii][Nn][Ss][Ee][Rr][Tt])", "insert"},
-            {R"([\s]*[Ss][Ee][Ll][Ee][Cc][Tt])", "select"},
-            {R"([\s]*[Ff][Rr][Oo][Mm])", "from"},
-            {R"([\s]*[Ww][Hh][Ee][Rr][Ee])", "where"},
-            {R"([\s]*[Uu][Pp][Dd][Aa][Tt][Ee])", "update"},
-            {R"([\s]*[Ss][Ee][Tt])", "set"},
-            {R"([\s]*[Dd][Ee][Ll][Ee][Tt][Ee])", "delete"},
-            {R"([\s]*[Jj][Oo][Ii][Nn])", "join"},
-            {R"([\s]*[Oo][Nn])", "on"},
-            {R"([\s]*[Tt][Oo])", "to"},
-            {R"([\s]*[Tt][Aa][Bb][Ll][Ee])", "table"},
-            {R"([\s]*[Cc][Rr][Ee][Aa][Tt][Ee])", "create"},
-            {R"([\s]*[Ii][Nn][Dd][Ee][Xx])", "index"},
-            {R"([\s]*[Uu][Nn][Ii][Qq][Uu][Ee][,]?)", "unique"},
-            {R"([\s]*[Aa][Uu][Tt][Oo][Ii][Nn][Cc][Rr][Ee][Mm][Ee][Nn][Tt][,]?)", "autoincrement"},
-            {R"([\s]*[Kk][Ee][Yy][,]?)", "key"},
+            //0
+            {R"([+])", "+"},
+            {R"([-])", "-"},
+            {R"([*])", "*"},
+            {R"([/])", "/"},
+            {R"([(])", "("},
+            {R"([)])", ")"},
+            {R"([%])", "%"},
+            {R"([<])", "<"},
+            {R"([>])", ">"},
+            {R"([=])", "="},
+            {R"([!])", "!"},
+            {R"([:])", ":"},
+            {R"([{])", "{"},
+            {R"([}])", "}"},
+            {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
+            {R"([<][=])", "<="},
+            {R"([>][=])", ">="},
+            {R"([!][=])", "!="},
+            {R"([&][&])", "&&"},
+            {R"([|][|])", "||"},
+            {R"([\^][\^])", "^^"},
+            {R"([Oo][Nn])", "on"},
+            {R"([Tt][Oo])", "to"},
+            {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
+            {R"([0][x][0-9a-f]+[,]?)", "bin"},
+            {R"([|][A-Za-z]*[|])", "module"},
+            {R"([Ss][Ee][Tt])", "set"},//26
+            {R"([Kk][Ee][Yy][,]?)", "key"},
+            {R"([Ff][Rr][Oo][Mm])", "from"},//28
+            {R"([Jj][Oo][Ii][Nn])", "join"},
+            {R"([t][r][u][e][,]?)", "true"},
+            {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
+            {R"([0][x][0-9a-f]+[,]?)", "bin"},
+            {R"([|][A-Za-z]*[|])", "module"},
+            {R"([f][a][l][s][e][,]?)", "false"},//35
+            {R"([Ii][Nn][Dd][Ee][Xx])", "index"},
+            {R"([Ww][Hh][Ee][Rr][Ee])", "where"},
+            {R"([Tt][Aa][Bb][Ll][Ee])", "table"},
+            {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
+            {R"([0][x][0-9a-f]+[,]?)", "bin"},
+            {R"([|][A-Za-z]*[|])", "module"},
+            {R"([Uu][Pp][Dd][Aa][Tt][Ee])", "update"},//43
+            {R"([Dd][Ee][Ll][Ee][Tt][Ee])", "delete"},
+            {R"([Cc][Rr][Ee][Aa][Tt][Ee])", "create"},
+            {R"([Uu][Nn][Ii][Qq][Uu][Ee][,]?)", "unique"},
+            {R"([Ii][Nn][Ss][Ee][Rr][Tt])", "insert"},
+            {R"([Ss][Ee][Ll][Ee][Cc][Tt])", "select"},
             //constants and types
-            {R"([\s]*[t][r][u][e][,]?)", "true"},
-            {R"([\s]*[f][a][l][s][e][,]?)", "false"},
-            {R"([\s]*[+-]?[0-9]+[,]?)", "int32"},
-            {R"([\s]*"[\a-zA-Z0-9_]*"[,]?)", "string"},
-            {R"([\s]*[0][x][0-9a-f]+[,]?)", "bin"}
+            {R"([+-]?[0-9]+[,]?)", "int32"},//49
+            {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
+            {R"([0][x][0-9a-f]+[,]?)", "bin"},
+            {R"([Aa][Uu][Tt][Oo][Ii][Nn][Cc][Rr][Ee][Mm][Ee][Nn][Tt][,]?)", "autoincrement"},
+            {R"([|][A-Za-z]*[|])", "module"}
     };
 }
 
+
+Token * TokenFactory::make_token(std::string &x) {
+    std::string ret_type, ret_val;
+    int l = 0, r = TokenFactory::tokens.size();
+
+    if (x.size() > 6) {
+        l = TokenFactory::tokens.size() - 5;
+    } else if (x.size() == 6) {
+        l = 45;
+    } else if (x.size() == 5) {
+        l = 37;
+        r = 45;
+    } else if (x.size() == 4) {
+        l = 30;
+        r = 37;
+    } else if (x.size() == 3) {
+        l = 28;
+        r = 37;
+    } else if (x.size() == 2) {
+        l = 16;
+        r = 28;
+    } else if (x.size() == 1) {
+        r = 16;
+    }
+
+    //const std::clock_t c_start = std::clock();
+    for (int i = l; i < r; i++) {
+        auto it = TokenFactory::tokens[i];
+        if (std::regex_match(x, std::regex(it.first))) {
+            ret_type = it.second;
+            ret_val = x;
+            break;
+        }
+    }
+
+    int ll = 0, rr = ret_val.size() - 1;
+
+    while(ret_val[ll] == ',' || ret_val[ll] == '|' ||  ret_val[ll] == '\"') {
+        ll++;
+    }
+
+    while(ret_val[rr] == ',' || ret_val[rr] == '|' ||  ret_val[rr] == '\"') {
+        rr--;
+    }
+
+    ret_val = ret_val.substr(ll, rr - ll + 1);
+
+
+    if (ret_val.empty()) {
+        return nullptr;
+    } else {
+        auto ret = new Token(ret_type, ret_val);
+        return ret;
+    }
+}
 
 Token::Token(std::string type, std::string value) {
     this->type = std::move(type);
@@ -59,18 +128,19 @@ Token::Token(std::string type, std::string value) {
 
 Token * TokenFactory::make_name(std::string &x) {
     std::string ret_type, ret_val;
-    if (std::regex_match(x, std::regex(R"([\s]*[s][t][r][i][n][g][0-9]*\[[0-9]+\][,:]?)"))
-        || std::regex_match(x, std::regex(R"([\s]*[i][n][t][3][2])"))
-           || std::regex_match(x, std::regex(R"([\s]*[b][o][o][l])")) ) {
+
+    if (std::regex_match(x, std::regex(R"([s][t][r][i][n][g][0-9]*\[[0-9]+\][,:]?)"))
+        || std::regex_match(x, std::regex(R"([i][n][t][3][2])"))
+           || std::regex_match(x, std::regex(R"([b][o][o][l])")) ) {
         ret_type = "type_name";
         ret_val = x;
-    } else if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*[,:]?)"))) {
+    } else if (std::regex_match(x, std::regex(R"([_]?[a-zA-Z_]+[0-9]*[,:]?)"))) {
         ret_type = "name";
         ret_val = x;
-    } else if (x == "," || std::regex_match(x, std::regex(R"([\s]*[,][\s]*)"))) {
+    } else if (x == "," || std::regex_match(x, std::regex(R"([,][\s]*)"))) {
         ret_type = "empty_name";
         ret_val = x;
-    } else if (std::regex_match(x, std::regex(R"([\s]*[_]?[a-zA-Z_]+[0-9]*.[a-zA-Z_]+[0-9]*[,:]?)") )) {
+    } else if (std::regex_match(x, std::regex(R"([_]?[a-zA-Z_]+[0-9]*.[a-zA-Z_]+[0-9]*[,:]?)") )) {
         ret_type = "complex_name";
         ret_val = x;
     }
@@ -95,31 +165,3 @@ Token * TokenFactory::make_name(std::string &x) {
     }
 }
 
-Token * TokenFactory::make_token(std::string &x) {
-    std::string ret_type, ret_val;
-    for (const auto &it : TokenFactory::tokens) {
-        if (std::regex_match(x, std::regex(it.first))) {
-            ret_type = it.second;
-            ret_val = x;
-        }
-    }
-
-    int ll = 0, rr = ret_val.size() - 1;
-
-    while(ret_val[ll] == ',' || ret_val[ll] == '|' ||  ret_val[ll] == '\"') {
-        ll++;
-    }
-
-    while(ret_val[rr] == ',' || ret_val[rr] == '|' ||  ret_val[rr] == '\"') {
-        rr--;
-    }
-
-    ret_val = ret_val.substr(ll, rr - ll + 1);
-
-    if (ret_val.empty()) {
-        return nullptr;
-    } else {
-        auto ret = new Token(ret_type, ret_val);
-        return ret;
-    }
-}
