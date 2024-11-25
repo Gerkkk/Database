@@ -107,9 +107,7 @@ public:
 
     bool add_column(std::shared_ptr<Column> &x) {
         if (columns.empty() || x->get_size() == this->size) {
-//            std::cout << "LOL" << x->get_size() << " " << this->size << " ";
             this->size = x->get_size();
-//            std::cout << this->size << std::endl;
             col_names.push_back(x->name);
             columns[col_names.back()] = x;
             this->size = x->get_size();

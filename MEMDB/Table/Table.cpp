@@ -87,7 +87,6 @@ void Table::load_from_file(std::ifstream &&in) {
             std::string col_name, type, max_len, default_value;
             in >> col_name >> type >> max_len >> default_value;
 
-//            std::cout << col_name << " " << type << " " << max_len << " " << default_value << " " << this->size <<  std::endl;
             std::shared_ptr<Column> cur(new Column(col_name, type, default_value, std::stoi(max_len)));
             std::list<std::string> cur_data;
             std::string v;
@@ -98,13 +97,6 @@ void Table::load_from_file(std::ifstream &&in) {
             cur->data = cur_data;
             this->col_names.push_back(col_name);
             this->columns[col_name] = cur;
-//            std::cout << "-----" << std::endl;
-//
-//            std::cout << (cur_data).size() <<  " " << this->size << std::endl;
-//            std::cout << ((columns[col_name])->data).size() << " "<< c << std::endl;
-//            for (auto &it: (columns[cur->name])->data) {
-//                std::cout << it << " ";
-//            }
         }
 
         int index_count;

@@ -180,6 +180,36 @@ public:
                     ret_value = "false";
                 }
             }
+        } else if (type == ">=") {
+            if (!left_son || !right_son) {
+                std::cout << "Greater-or-equals should have 2 operands" << std::endl;
+                exit(-1);
+            }
+
+            ret_type = "bool";
+
+            if (left_son->ret_type != right_son->ret_type) {
+                std::cout << "Greater-or-equals should have 2 operands of the same type" << std::endl;
+                exit(-1);
+            } else if (left_son->ret_type == "int32"){
+                if (std::stoi(left_son->ret_value) >= std::stoi(right_son->ret_value)) {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            } else if (left_son->ret_type == "string") {
+                if (left_son->ret_value.compare(right_son->ret_value) >= 0) {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            } else if (left_son->ret_type == "bool") {
+                if (left_son->ret_value == "true" || right_son->ret_value == "false") {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            }
         } else if (type == "<") {
             if (!left_son || !right_son) {
                 std::cout << "Less should have 2 operands" << std::endl;
@@ -205,6 +235,36 @@ public:
                 }
             } else if (left_son->ret_type == "bool") {
                 if (left_son->ret_value == "false" && right_son->ret_value == "true") {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            }
+        } else if (type == "<=") {
+            if (!left_son || !right_son) {
+                std::cout << "Less-or-equal should have 2 operands" << std::endl;
+                exit(-1);
+            }
+
+            ret_type = "bool";
+
+            if (left_son->ret_type != right_son->ret_type) {
+                std::cout << "Less-or-equal should have 2 operands of the same type" << std::endl;
+                exit(-1);
+            } else if (left_son->ret_type == "int32"){
+                if (std::stoi(left_son->ret_value) <= std::stoi(right_son->ret_value)) {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            } else if (left_son->ret_type == "string") {
+                if (left_son->ret_value.compare(right_son->ret_value) <= 0) {
+                    ret_value = "true";
+                } else {
+                    ret_value = "false";
+                }
+            } else if (left_son->ret_type == "bool") {
+                if (left_son->ret_value == "false" || right_son->ret_value == "true") {
                     ret_value = "true";
                 } else {
                     ret_value = "false";
@@ -265,6 +325,43 @@ public:
                     exit(-1);
                 }
             }
+        } else if (type == "||") {
+            if (!left_son || !right_son) {
+                std::cout << "Logical or should have 2 operands" << std::endl;
+                exit(-1);
+            }
+            std::cout << "OOPP " <<  ret_value << std::endl;
+
+            if (left_son->ret_type != right_son->ret_type) {
+                std::cout << "Logical or should have 2 operands of type bool" << std::endl;
+                exit(-1);
+            } else {
+                ret_type = "bool";
+                if (left_son->ret_type == "bool") {
+                    ret_value = ((left_son->ret_value == "true") | (right_son->ret_value == "true")) ? "true" : "false";
+                } else {
+                    std::cout << "Logical or should have 2 operands of type bool" << std::endl;
+                    exit(-1);
+                }
+            }
+        } else if (type == "^^") {
+            if (!left_son || !right_son) {
+                std::cout << "Xor should have 2 operands" << std::endl;
+                exit(-1);
+            }
+
+            if (left_son->ret_type != right_son->ret_type) {
+                std::cout << "Xor should have 2 operands of type bool" << std::endl;
+                exit(-1);
+            } else {
+                ret_type = "bool";
+                if (left_son->ret_type == "bool") {
+                    ret_value = ((left_son->ret_value == "true") ^ (right_son->ret_value == "true")) ? "true" : "false";
+                } else {
+                    std::cout << "Xor should have 2 operands of type bool" << std::endl;
+                    exit(-1);
+                }
+            }
         } else if (type == "name") {
             if(column_types.size() > 1) {
                 std::cout << "There is more than one table in expression. Use the name of the table in addition to name of the column" << std::endl;
@@ -281,6 +378,24 @@ public:
                 }
 
                 ret_value = (*(*column_values.begin()).second[value]);
+            }
+        } else if (type == "module") {
+            if (column_types.size() == 0) {
+                std::cout << "Not enough tables for execute" << std::endl;
+                exit(-1);
+            } else {
+                if ((*column_types.begin()).second.find(value) != (*column_types.begin()).second.end()) {
+                    if ((*column_types.begin()).second[value] != "string") {
+                        std::cout << "We only can take module of a string" << std::endl;
+                        exit(-1);
+                    } else {
+                        ret_type = "int32";
+                        ret_value = std::to_string((*(*column_values.begin()).second[value]).size());
+                    }
+                } else {
+                    std::cout << "No column with name " << value << " in table " << (*column_types.begin()).first << std::endl;
+                    exit(-1);
+                }
             }
         }
 

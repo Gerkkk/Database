@@ -29,17 +29,9 @@ namespace memdb {
 
          DBResult execute(std::string &query) {
              auto db_res = new DBResult();
-
-
              Preprocessor P = Preprocessor(query);
-             //const std::clock_t c_start = std::clock();
              PreprocessorResult *p_res = P.Parse();
-
-             //const std::clock_t c_1 = std::clock();
-             //std::cout  << "Before execution " << 1000 * (c_1 - c_start) / CLOCKS_PER_SEC << "ms" << std::endl;
              std::vector<QueryResult> prom_res;
-
-
 
              if (!p_res->is_ok()) {
                  db_res->ok = false;
@@ -66,13 +58,15 @@ namespace memdb {
                          UpdateQuery upd = UpdateQuery(this, it.commands, true);
                          qr = upd.execute();
                      } else {
-                         db_res->ok = false;
-                         db_res->error = "Uknown command";
+                         qr = new QueryResult();
+                         qr->ok = false;
+                         qr->error = "Executor: Uknown command, which starts with " + it.commands[0]->value;
                      }
 
                      if (!qr->is_ok()) {
                          db_res->error = qr->error;
                          db_res->ok = false;
+                         break;
                      } else {
                          prom_res.push_back(*qr);
                      }
@@ -123,13 +117,12 @@ namespace memdb {
                     }
                 }
 
-
                 if (!end_val) {
                     is_ok = false;
                     err = "Wrong structure of Insert query. No word \"to\"";
                 }
 
-                if (i + 1 > s.size()) {
+                if (is_ok  && i + 1 >= s.size()) {
                     is_ok = false;
                     err = "Wrong structure of Insert query. No name of the table.";
                 }
@@ -211,7 +204,6 @@ namespace memdb {
                 }
 
                 if (!from_val) {
-
                     is_ok = false;
                     err = "Wrong structure of Select query. Expected word \"from\"";
                 }
@@ -239,6 +231,7 @@ namespace memdb {
             }
 
             QueryResult *execute () override {
+
                 SyntaxTree st = SyntaxTree(conditions);
                 auto res = new QueryResult;
 
@@ -301,6 +294,7 @@ namespace memdb {
                         counter++;
                     }
                 }
+                //std::cout << res->data.columns.size() << std::endl;
                 return res;
             }
         };

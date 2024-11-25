@@ -145,14 +145,11 @@ PreprocessorResult * Preprocessor::Preprocess() {
             i++;
         }
 
-        //std::cout << i << std::endl;
         if(!buf.empty()) {
             Token *r = T.make_token(buf);
-            //std::cout << "! " << buf << std::endl;
             if (r != nullptr) {
                 cur_tokens.push_back(r);
             } else {
-                //Maybe check for correct name
                 Token *rr = T.make_name(buf);
 
                 if (rr != nullptr) {

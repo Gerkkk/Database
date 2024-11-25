@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
 #include "../MEMDB/Database/Database.h"
 #include <ctime>
+#include <fstream>
 
 using namespace memdb;
 
@@ -113,11 +114,21 @@ TEST(QueryTests, Test1) {
     sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 2);
 
-    //Logical not in condition, = in condition
-    s = "select name from People where Age = 19 && !(is_student);";
+    //<=
+    s = "select name from People where Age <= 45;";
+    dbres = db.execute(s);
+    sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 6);
+
+    //>=
+    s = "select name from People where Age >= 45;";
     dbres = db.execute(s);
     sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 1);
+
+    s = "select name from People where Age = 19 && !(is_student);";
+    dbres = db.execute(s);
+    EXPECT_EQ(db.tables["People"]->size, 6);
 
     //Empty Delete
     s = "delete People where Age = 18;";
@@ -217,6 +228,18 @@ TEST(QueryTests, Test2) {
     auto sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 8);
 
+    //Select with |name| condition
+    s = "select name from Employees where |name| = 3;";
+    dbres = db.execute(s);
+    sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 2);
+
+    //Select with |name| condition
+    s = "select name from Employees where (|name| = 3) ^^ (|name| = 4);";
+    dbres = db.execute(s);
+    sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 4);
+
     //Select with / condition
     s = "select name from Employees where Age / 2 = 9;";
     dbres = db.execute(s);
@@ -244,4 +267,122 @@ TEST(QueryTests, Test2) {
     dbres = db.execute(s);
     sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 1);
+}
+
+
+TEST(QueryTests, Test3) {
+
+    //Some errors
+    Database db;
+
+    std::string s = "create table People (name : string[32] = noname, Age : int32 = 18, (autoincrement) id : int32 = -2, is_student : bool = false);";
+    db.execute(s);
+
+    //Checking uknown word case
+    s = "]kek[;";
+    DBResult dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Preprocessor: uknown word ]kek[");
+
+    //Checking uknown word case
+    s = "(]kek[);";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Preprocessor: uknown word ]kek[");
+
+    s = "on;";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Executor: Uknown command, which starts with on");
+
+    s = "insert;";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Wrong structure of Insert query. No word \"to\"");
+
+    s = "insert to;";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Wrong structure of Insert query. No name of the table.");
+
+    s = "insert (1, 2, 3) to Houses;";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Insert query: No such table in database");
+
+//    s = "select;";
+//    dbres = db.execute(s);
+//    EXPECT_EQ(dbres.error, "Wrong structure of Select query. Expected word \"from\"");
+
+//    s = "select from where;";
+//    dbres = db.execute(s);
+//    EXPECT_EQ(dbres.error, "Wrong structure of Select query. No name of the source table.");
+//
+    s = "select from People;";
+    dbres = db.execute(s);
+    EXPECT_EQ(dbres.error, "Wrong structure of Select query. Expected word \"where\".");
+}
+
+TEST(QueryTests, Test4) {
+
+    //Serialization
+    Database db;
+
+    //Checking column flags. Also checking that names of tables and columns are sensitive to register
+    std::string s = "create table Employees ((autoincrement, key) id : int32 = 0, name : string[32] = \"empty_name\", Age : int32 = 18, department_id : int32 = -1);";
+    db.execute(s);
+    s = "create table Departments ((key) id : int32 = 0, name : string[32] = \"headquarters\", city : string[50] = \"Moscow\");";
+    db.execute(s);
+
+    //->Bad, to many commas. Change this
+    s = "insert ( , Ivan,  ,  ,) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Denis,  ,  ,) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Maria,  ,  ,) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Janet,  ,  ,) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Samwell,  ,  ,) to Employees;";
+    db.execute(s);
+
+
+    s = "insert ( , Mike, 34, 5) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Tom, 23, 5) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Leo, 46, 5) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Howard, 31, 5) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Constance, 29, 5) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , Constance, 19, 3) to Employees;";
+    db.execute(s);
+
+    s = "insert ( , George, 20, 3) to Employees;";
+    db.execute(s);
+
+    s = "insert (-1, , ,) to Departments;";
+    db.execute(s);
+
+    s = "insert (5, PR, Berlin) to Departments;";
+    db.execute(s);
+
+    s = "insert (3, IT, Paris) to Departments;";
+    db.execute(s);
+
+    db.save_to_file(std::ofstream("file.bin", std::ios::binary));
+    Database db1;
+    db1.load_from_file(std::ifstream("file.bin", std::ios::binary));
+
+    EXPECT_EQ(db.tables.size(), db1.tables.size());
+
+    for (auto it : db.tables) {
+        EXPECT_EQ(db.tables[it.first]->size, db1.tables[it.first]->size);
+        EXPECT_EQ(db.tables[it.first]->columns.size(), db1.tables[it.first]->columns.size());
+    }
 }

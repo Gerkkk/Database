@@ -30,14 +30,10 @@ void Database::load_from_file(std::ifstream &&in) {
 
         for (int i = 0; i < c; i++) {
             std::basic_ifstream<char> &cur_in = in;
-
             std::shared_ptr<Table> cur_table(new Table(""));
             cur_table->load_from_file(std::forward<std::basic_ifstream<char>>(cur_in));
-            //tables.push_back(std::shared_ptr<Table>(&cur_table));
             add_table(cur_table);
         }
-//        std::cout << "So stupid" << std::endl;
-//        print_database();
     } else {
         std::cout << "Trying to write to closed file" << std::endl;
         exit(-1);

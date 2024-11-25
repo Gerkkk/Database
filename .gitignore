@@ -16,3 +16,4 @@ CTestTestfile.cmake
 Makefile
 Test[1]_include.cmake
 Test[1]_tests.cmake
+.idea
