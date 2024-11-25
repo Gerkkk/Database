@@ -69,8 +69,6 @@ PreprocessorResult * Preprocessor::Parse() {
 
     }
 
-
-
     PreprocessorResult *res = this->Preprocess();
     return res;
 }
@@ -78,16 +76,24 @@ PreprocessorResult * Preprocessor::Parse() {
 PreprocessorResult * Preprocessor::Preprocess() {
     std::vector<CommandsLine> res;
 
+    //const std::clock_t c_start = std::clock();
+
     for (std::pair<std::string, bool> cur_query: this->prom_res) {
         std::vector<Token *> cur_tokens;
         std::string buf;
         int i = 0;
+        TokenFactory T = TokenFactory();
+
+        //std::cout << cur_query.first.size() << std::endl;
+        const std::clock_t c_start = std::clock();
 
         while (i < cur_query.first.size()) {
+
+
             if (cur_query.first[i] == '\n' || cur_query.first[i] == ' ') {
                 if (!buf.empty()) {
-                    TokenFactory T = TokenFactory();
                     Token *r = T.make_token(buf);
+
                     //std::cout << "! " << buf << std::endl;
                     if (r != nullptr) {
                         cur_tokens.push_back(r);
@@ -107,7 +113,6 @@ PreprocessorResult * Preprocessor::Preprocess() {
                 }
             } else if (cur_query.first[i] == '(' || cur_query.first[i] == ')') {
                 if (!buf.empty()) {
-                    TokenFactory T = TokenFactory();
                     Token *r = T.make_token(buf);
                     //std::cout << "! " << buf << std::endl;
                     if (r != nullptr) {
@@ -127,7 +132,6 @@ PreprocessorResult * Preprocessor::Preprocess() {
                     buf = "";
                 }
 
-                TokenFactory T = TokenFactory();
                 buf.push_back(cur_query.first[i]);
                 Token *rr = T.make_token(buf);
                 cur_tokens.push_back(rr);
@@ -143,7 +147,6 @@ PreprocessorResult * Preprocessor::Preprocess() {
 
         //std::cout << i << std::endl;
         if(!buf.empty()) {
-            TokenFactory T = TokenFactory();
             Token *r = T.make_token(buf);
             //std::cout << "! " << buf << std::endl;
             if (r != nullptr) {
@@ -171,6 +174,7 @@ PreprocessorResult * Preprocessor::Preprocess() {
     prep_res->ok = this->ok;
     prep_res->error = this->error;
     prep_res->data = res;
+
 
     return prep_res;
 }
