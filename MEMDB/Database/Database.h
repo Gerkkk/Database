@@ -11,6 +11,7 @@
 
 
 namespace memdb {
+    //Database is just a map of tables
     class Database {
     public:
         std::vector<std::string> table_names;
@@ -25,6 +26,9 @@ namespace memdb {
 
         DBResult execute(std::string &query);
 
+        //Base class for queries. The main property is the execute method.
+        //in fact, we also have to save here stack of recent results for subqueries.
+        //But we will deal with it later, when we will implement subqueries.
         class Query {
         public:
             Database *db;
@@ -34,11 +38,11 @@ namespace memdb {
             };
 
             virtual QueryResult * execute() = 0;
-
             ~Query() = default;
         };
 
-//in fact, we also have to save here stack of recent results for subqueries. but
+        //Here are all the types of queries. They are almost the same.
+        //Some interesting moments are commented
         class InsertQuery : public Query {
         public:
             bool is_ok;
@@ -84,9 +88,9 @@ namespace memdb {
             Token *table_name;
             std::string err;
 
+            //Structure for convenient storage of information about new column
             struct Column_description {
                 std::string name;
-
                 std::string type;
                 std::string max_len;
                 std::string default_value;
@@ -109,6 +113,8 @@ namespace memdb {
             Token *table_name;
             std::vector<Token *> conditions;
 
+            //structure for assignments of update. Stores Syntax tree for math expression which describes assignment
+            //and name of column that we change
             struct assignment {
                 std::string col_name;
                 SyntaxTree column_st;

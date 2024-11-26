@@ -6,7 +6,7 @@
 #include <map>
 #include <vector>
 
-
+//Class for words in a query. Storing type of word and value of the string
 class Token {
 public:
     std::string type;
@@ -16,7 +16,7 @@ public:
     ~Token() = default;
 };
 
-
+//Class that can create Tokens of two types: name and regular
 class TokenFactory {
 public:
     TokenFactory();
@@ -26,7 +26,7 @@ private:
     std::vector<std::pair<std::string, std::string>> tokens;
 };
 
-
+//Class for one query as a tuple of tokens. Needed for two things: handling several queries in one execute and handling nested queries
 struct CommandsLine {
 public:
     bool flag;

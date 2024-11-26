@@ -2,17 +2,9 @@
 
 using namespace memdb;
 
+//assigns fields of class that are needed for execution. Finds definitions of all the columns and saves them
 Database::CreateQuery::CreateQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
     is_ok = true;
-
-//                for (auto it : s) {
-//                    std::cout << it->value << " ";
-//                }
-//                std::cout << std::endl;
-//                for (auto it : s) {
-//                    std::cout << it->type << " ";
-//                }
-//                std::cout << std::endl;
 
     if (s.size() < 3 || s[0]->type != "create" || s[1]->type != "table" || s[2]->type != "name") {
         is_ok = false;
@@ -62,7 +54,6 @@ Database::CreateQuery::CreateQuery(Database *db, std::vector<Token *> &s, bool n
             }
 
             if (j == s[i]->value.size()) {
-                //std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
                 max_len = "11";
             } else {
                 j++;
@@ -85,16 +76,13 @@ Database::CreateQuery::CreateQuery(Database *db, std::vector<Token *> &s, bool n
         }
 
         i++;
-//                    std::cout << "@@@@@" << std::endl;
-//                    std::cout << cur_col.name << "\n" << cur_col.type <<  "\n" << cur_col.default_value << "\n";
-//                    std::cout << cur_col.max_len << "\n" << cur_col.is_key << " " << cur_col.is_autoincrement << " " << cur_col.is_unique << "\n";
-//                    std::cout << "@@@@@" << std::endl;
 
         new_columns.push_back(cur_col);
         delete ptr;
     }
 }
 
+//Calling constructor ot table using data parsed in constructor
 QueryResult * Database::CreateQuery::execute () {
     auto res = new QueryResult;
 

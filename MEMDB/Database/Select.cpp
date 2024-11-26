@@ -2,6 +2,8 @@
 
 using namespace memdb;
 
+//assigns fields of class that are needed for execution. Finds conditions, columns that are searched for, source table
+//also handles basic errors
 Database::SelectQuery::SelectQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
         is_ok = true;
 
@@ -44,8 +46,8 @@ Database::SelectQuery::SelectQuery(Database *db, std::vector<Token *> &s, bool n
 }
 
 
+//iterating through rows of the source table and checking if the condition is met for each row
 QueryResult * Database::SelectQuery::execute() {
-
     SyntaxTree st = SyntaxTree(conditions);
     auto res = new QueryResult;
 
@@ -87,8 +89,6 @@ QueryResult * Database::SelectQuery::execute() {
             st.execute(ct, cv);
             std::pair<std::string, std::string> st_res = st.get_res();
 
-//                        std::cout << *cv["People"]["names"] << std::endl;
-//                        std::cout << st_res.first << " " << st_res.second << std::endl;
             if (st_res.first == "bool" && st_res.second == "true") {
                 res->data.size++;
                 for (auto it : columns_map) {
@@ -108,6 +108,5 @@ QueryResult * Database::SelectQuery::execute() {
             counter++;
         }
     }
-    //std::cout << res->data.columns.size() << std::endl;
     return res;
 }

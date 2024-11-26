@@ -2,6 +2,8 @@
 
 using namespace memdb;
 
+//assigns fields of class that are needed for execution. Finds conditions, source table
+//also handles basic errors
 Database::DeleteQuery::DeleteQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
         is_ok = true;
 
@@ -30,6 +32,8 @@ Database::DeleteQuery::DeleteQuery(Database *db, std::vector<Token *> &s, bool n
 
 
 
+//iterating through rows of the source table and deleting those that meet conditions
+//the signature of erase of std::list, which returns iterator to next value after the deleted one, is very helpful
 QueryResult * Database::DeleteQuery::execute () {
     SyntaxTree st = SyntaxTree(conditions);
 
@@ -50,15 +54,6 @@ QueryResult * Database::DeleteQuery::execute () {
 
         std::map<std::string, std::list<std::string>::iterator> columns_map;
         std::map<std::string, std::string> column_types;
-//                for(auto it : columns) {
-//                    col_names.push_back(it->value);
-//                    auto pr_col = table->columns[it->value];
-//
-//                    auto new_col = std::shared_ptr<Column>(new Column(pr_col->name, pr_col->type, pr_col->default_value,
-//                                                                      pr_col->max_len, pr_col->is_unique, pr_col->is_autoincrement,
-//                                                                      pr_col->is_key, {}));
-//                    res->data.add_column(new_col);
-//                }
 
         for(auto it : table->col_names) {
             columns_map[it] = table->columns[it]->data.begin();
@@ -73,19 +68,9 @@ QueryResult * Database::DeleteQuery::execute () {
 
         int delta = 0;
         while (counter < table->size) {
-//                        for (auto it : columns_map) {
-//                            //add condition for delete
-//                            columns_map[it.first] = table->columns[it.first]->data.erase(it.second);
-//                        }
-//
-//                        counter++;
-//
-            //add math expression checker
+
             st.execute(ct, cv);
             std::pair<std::string, std::string> st_res = st.get_res();
-
-//                        std::cout << *cv["People"]["names"] << std::endl;
-//                        std::cout << st_res.first << " " << st_res.second << std::endl;
 
             if (st_res.first == "bool" && st_res.second == "true") {
                 for (auto it : columns_map) {

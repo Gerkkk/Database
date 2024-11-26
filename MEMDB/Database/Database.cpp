@@ -7,6 +7,8 @@ void Database::add_table(std::shared_ptr<Table> &x) {
     tables[x->name] = x;
 }
 
+
+//Uses Table's save_to_file, so it is rather simple
 void Database::save_to_file(std::ofstream &&out) {
     if(out.is_open()) {
         out << tables.size() << " ";
@@ -22,6 +24,7 @@ void Database::save_to_file(std::ofstream &&out) {
     }
 }
 
+//Uses Table's load_from_file so is rather simple
 void Database::load_from_file(std::ifstream &&in) {
     if(in.is_open()) {
         int c;
@@ -39,6 +42,7 @@ void Database::load_from_file(std::ifstream &&in) {
     }
 }
 
+//For convenient and beautiful debug
 void Database::print_database() {
     std::cout << "=======Database Print=======" << std::endl;
 
@@ -53,6 +57,8 @@ void Database::print_database() {
 }
 
 
+//All these ifs are bad. Really bad. In ideal world we would have an abstract factory for queries
+//but I only had time for the easiest solution
 DBResult Database::execute(std::string &query) {
     auto db_res = new DBResult();
     Preprocessor P = Preprocessor(query);
@@ -76,7 +82,6 @@ DBResult Database::execute(std::string &query) {
             } else if (it.commands[0]->type == "delete") {
                 DeleteQuery del = DeleteQuery(this, it.commands, true);
                 qr = del.execute();
-
             } else if (it.commands[0]->type == "create") {
                 CreateQuery cr = CreateQuery(this, it.commands, true);
                 qr = cr.execute();

@@ -1,10 +1,10 @@
 #include "Token.h"
 #include <string>
 
+//Static map with tokens. I believe we do not need derived classes for each token type
+//since the structure of the token is the same. Token is fully defined by regex
 TokenFactory::TokenFactory(){
     tokens = {
-            //Math symbols
-            //0
             {R"([+])", "+"},
             {R"([-])", "-"},
             {R"([*])", "*"},
@@ -70,6 +70,9 @@ Token * TokenFactory::make_token(std::string &x) {
     std::string ret_type, ret_val;
     int l = 0, r = TokenFactory::tokens.size();
 
+    //All these weird numbers are needed for optimization of searching for token type
+    //Since calling 50 regexes takes too much time
+    //This is the weakest point of the program, searching for correct token takes too much time
     if (x.size() > 6) {
         l = TokenFactory::tokens.size() - 5;
     } else if (x.size() == 6) {
@@ -100,6 +103,7 @@ Token * TokenFactory::make_token(std::string &x) {
         }
     }
 
+    //Clearing string
     int ll = 0, rr = ret_val.size() - 1;
 
     while(ret_val[ll] == ',' || ret_val[ll] == '|' ||  ret_val[ll] == '\"') {
@@ -146,6 +150,7 @@ Token * TokenFactory::make_name(std::string &x) {
         ret_val = x;
     }
 
+    //Clearing string
     int ll = 0, rr = ret_val.size() - 1;
 
     while(ret_val[ll] == ',' || ret_val[ll] == '|' ||  ret_val[ll] == '\"') {

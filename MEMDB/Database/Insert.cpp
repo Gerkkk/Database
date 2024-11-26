@@ -2,6 +2,9 @@
 
 using namespace memdb;
 
+//assigns fields of class that are needed for execution. Finds values for each table
+//also handles basic errors
+//NB: Only one type of insert is implemented: the one, that requires all the columns to be assigned
 Database::InsertQuery::InsertQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
         is_ok = true;
 
@@ -32,7 +35,8 @@ Database::InsertQuery::InsertQuery(Database *db, std::vector<Token *> &s, bool n
         table_name = s[i + 1];
 }
 
-
+//iterating through columns and pushing back new values
+//Checks sizes of new elements
 QueryResult * Database::InsertQuery::execute () {
     auto res = new QueryResult;
 

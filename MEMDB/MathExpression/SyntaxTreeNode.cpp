@@ -1,5 +1,6 @@
 #include "MathExpression.h"
 
+
 SyntaxTreeNode::SyntaxTreeNode(std::string &inp_value, std::string &inp_type) {
     value = inp_value;
     type = inp_type;
@@ -17,6 +18,9 @@ SyntaxTreeNode::~SyntaxTreeNode() {
     }
 }
 
+//This method executes one tree node
+//All these ifs are bad. Very bad. In ideal world we would have class MathExpression
+//And derived class for each expression. But I only had time for the simplest solution
 void SyntaxTreeNode::execute(std::map<std::string, std::map<std::string, std::string>> &column_types, std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values) {
     if (left_son) {
         left_son->execute(column_types, column_values);
@@ -26,7 +30,7 @@ void SyntaxTreeNode::execute(std::map<std::string, std::map<std::string, std::st
         right_son->execute(column_types, column_values);
     }
 
-    //cringy ifs
+    //Cringy ifs
     if (type == "+") {
         if(!left_son || !right_son) {
             std::cout << "plus should have 2 operands" << std::endl;

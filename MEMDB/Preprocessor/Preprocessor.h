@@ -1,5 +1,6 @@
 #include "../Result/Result.h"
 
+//This structure will split the initial string into subqueries and then each query into tokens
 class Preprocessor {
     std::string source;
     std::vector<std::string> queries;

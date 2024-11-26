@@ -10,6 +10,7 @@ PreprocessorResult * Preprocessor::Parse() {
     std::vector<std::string> commands;
     int i = 0;
 
+    //splitting string into queries with ";"
     while (i < this->source.size()) {
         if (this->source[i] != ';') {
             buf.push_back(this->source[i]);
@@ -28,12 +29,14 @@ PreprocessorResult * Preprocessor::Parse() {
         std::vector<std::string> temp;
 
         while (i < cur_command.size()) {
+            //Subqueries will be marked with {}
             if (cur_command[i] == '{') {
                 balance++;
             } else if (cur_command[i] == '}') {
                 balance--;
                 //Should be rewritten to work recursive
                 if (balance == 0) {
+                    //this is a special sign for table which is a result of previous query
                     curq_buf += (" _PREV" + std::to_string(q_subq + 1) + " ");
                     q_subq++;
                     temp.push_back(subq_buf);
@@ -78,12 +81,14 @@ PreprocessorResult * Preprocessor::Parse() {
 PreprocessorResult * Preprocessor::Preprocess() {
     std::vector<CommandsLine> res;
 
+    //Preprocessing each query
     for (std::pair<std::string, bool> cur_query: this->prom_res) {
         std::vector<Token *> cur_tokens;
         std::string buf;
         int i = 0;
         TokenFactory T = TokenFactory();
 
+        //This long while loop splits string by " ", "\n" and creates tokens out of pieces
         while (i < cur_query.first.size()) {
             if (cur_query.first[i] == '\n' || cur_query.first[i] == ' ') {
                 if (!buf.empty()) {

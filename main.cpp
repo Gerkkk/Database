@@ -4,9 +4,7 @@
 using namespace memdb;
 
 int main() {
-
     Database db;
-
 
     //Create query1
     std::string s8 = "create table People ((unique) names : string[32] = noname, Ages : int32 = 18, (autoincrement) id : int32 = -2, is_student : bool = false);";
@@ -38,8 +36,6 @@ int main() {
 //    std::cout << dbres0.get_error() << std::endl;
 //    db.print_database();
 //    std::cout << "===============" << std::endl;
-
-
 
     return 0;
 }

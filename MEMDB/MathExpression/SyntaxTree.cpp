@@ -1,5 +1,7 @@
 #include "MathExpression.h"
 
+
+//Static map with operations priorities
 //keep priorities like in c++ in case we will add some new operators
 std::map<std::string ,int> SyntaxTree::operations_priority = {
         {"||", 15},
@@ -32,16 +34,19 @@ SyntaxTree::SyntaxTree(std::vector<Token *> &expr) {
     head = build_tree(source);
 }
 
+//Execute of syntax tree is executing it's head node
 void SyntaxTree::execute(std::map<std::string, std::map<std::string, std::string>> &column_types, std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values) {
     head->execute(column_types, column_values);
 };
 
-//type, value
+//returns type and value of return of syntax tree
 std::pair<std::string, std::string> SyntaxTree::get_res() {
     return std::make_pair(head->ret_type, head->ret_value);
 }
 
-
+//Building syntax tree. Splits vector of Tokens with less prioritized operation.
+//Also handling ( )
+//Then creates node of chosen operation and recursively builds subtrees
 SyntaxTreeNode *SyntaxTree::build_tree(std::vector<Token *> expr) {
     if (expr.empty()) {
         return nullptr;
@@ -141,7 +146,7 @@ SyntaxTreeNode *SyntaxTree::build_tree(std::vector<Token *> expr) {
     return new_node;
 }
 
-
+//finds less prioritized operation in a vector of tokens
 int SyntaxTree::find_next_operation(std::vector<Token *> expr) {
     //add check for parenthesis wrrors
     int ans_ind = -1, max_prior = -1;

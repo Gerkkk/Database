@@ -7,6 +7,8 @@
 #include <memory>
 #include <set>
 
+//Class for columns. We will store all the information about values in a column
+//and a vector of strings for data
 class Column {
 public:
     std::string name;
@@ -81,6 +83,8 @@ public:
     ~Column() = default;
 };
 
+
+//Table will contain map of columns and indexes
 class Table {
 public:
     std::string name;
@@ -111,6 +115,7 @@ public:
         }
     }
 
+    //Just printing datas of all columns
     void print_table() {
         std::cout << this->name << std::endl;
         for (auto const &col_name: col_names) {

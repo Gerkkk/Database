@@ -2,18 +2,10 @@
 
 using namespace memdb;
 
-
+//assigns fields of class that are needed for execution. Finds conditions, columns that are updated, source table, assignments
+//also handles basic errors
 Database::UpdateQuery::UpdateQuery(Database *db, std::vector<Token *> &s, bool need) : Query(db) {
     is_ok = true;
-
-//                for (auto it : s) {
-//                    std::cout << it->value << " ";
-//                }
-//                std::cout << std::endl;
-//                for (auto it : s) {
-//                    std::cout << it->type << " ";
-//                }
-//                std::cout << std::endl;
 
     if (s.size() < 3 || s[0]->type != "update" || s[1]->type != "name" || s[2]->type != "set") {
         is_ok = false;
@@ -21,7 +13,6 @@ Database::UpdateQuery::UpdateQuery(Database *db, std::vector<Token *> &s, bool n
     }
 
     table_name = s[1];
-
     int r = 3;
 
     while(r < s.size() && s[r]->type != "where") r++;
@@ -37,21 +28,18 @@ Database::UpdateQuery::UpdateQuery(Database *db, std::vector<Token *> &s, bool n
 
     int l = 3;
 
-    //std::cout << "HERE " << l << " " << r << std::endl;
     while (l != r) {
         std::string cur_column;
         std::vector<Token *> comm;
 
         cur_column = s[l]->value;
-
         l += 2;
-        //std::cout << "HERE " << l << " " << r << std::endl;
+
         while (l != r && s[l]->type != "=") {
             comm.push_back(s[l]);
             l++;
         }
 
-//                    std::cout << "HERE " << l << " " << r << std::endl;
 
         if (l != r) {
             l -= 2;
@@ -65,13 +53,11 @@ Database::UpdateQuery::UpdateQuery(Database *db, std::vector<Token *> &s, bool n
         if (l != r) {
             l++;
         }
-        //std::cout << "HERE " << l << " " << r << std::endl;
     }
-    //std::cout << "HERE " << l << " " << r << std::endl;
-
 }
 
-
+//iterating through rows of the source table and checking if the condition is met for each row
+//Updating the values using syntax trees in assignments if needs be
 QueryResult * Database::UpdateQuery::execute () {
     SyntaxTree st = SyntaxTree(conditions);
     auto res = new QueryResult;
@@ -105,14 +91,10 @@ QueryResult * Database::UpdateQuery::execute () {
             st.execute(ct, cv);
             std::pair<std::string, std::string> st_res = st.get_res();
 
-//                      std::cout << *cv["People"]["names"] << std::endl;
-//                      std::cout << st_res.first << " " << st_res.second << std::endl;
             if (st_res.first == "bool" && st_res.second == "true") {
                 for (auto assignment: assignments) {
-                    //std::cout << assignment.col_name << std::endl;
                     assignment.column_st.execute(ct, cv);
                     std::pair<std::string, std::string> st_res = assignment.column_st.get_res();
-                    //std::cout << st_res.first << " " << st_res.second << std::endl;
                     if (st_res.first != table->columns[assignment.col_name]->type) {
                         std::cout << "Update: Update with wrong type" << std::endl;
                     } else if (st_res.first == "string" && st_res.second.size() > table->columns[assignment.col_name]->max_len) {
@@ -124,7 +106,6 @@ QueryResult * Database::UpdateQuery::execute () {
                     } else {
                         (*cv[table->name][assignment.col_name]) = st_res.second;
                     }
-                    //std::cout << "AAAAAAA" << std::endl;
                 }
 
                 for (auto it : columns_map) {

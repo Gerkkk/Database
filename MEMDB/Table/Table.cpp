@@ -2,6 +2,7 @@
 #include <fstream>
 #include <utility>
 
+//Column constructor just initializes all the fields
 Column::Column(std::string &name, std::string &type, std::string &default_value, int max_len=11, bool is_unique=false, bool is_autoincrement=false, bool is_key=false, std::list<std::string> data = {}) {
     this->name = name;
     this->type = type;
@@ -21,6 +22,7 @@ Column::Column(std::string &name, std::string &type, std::string &default_value,
     }
 }
 
+//Column constructor just initializes all the fields. This version was used for testing when there were no queries create and insert
 Column::Column(std::string &&name, std::string &&type, std::string &&default_value, int max_len = 11, bool is_unique=false, bool is_autoincrement=false, bool is_key=false, std::list<std::string> &&data = {}) {
     this->name = name;
     this->type = type;
@@ -54,7 +56,9 @@ void Table::create_index(std::string &s) {
     this->indexes[s] = {};
 }
 
-
+//Serialize all the fields in convenient order
+//Is not asked for in the task, but would be convenient if we wanted to print the result of query
+//And simplifies implementation of Database serialization
 void Table::save_to_file(std::ofstream &&out) {
     if(out.is_open()) {
         out << this->name << " " << this->size << " " << this->col_names.size() << " ";
@@ -77,7 +81,7 @@ void Table::save_to_file(std::ofstream &&out) {
     }
 }
 
-
+//Deserializing file in the exact same order as we serialized it
 void Table::load_from_file(std::ifstream &&in) {
     if(in.is_open()) {
         int c;

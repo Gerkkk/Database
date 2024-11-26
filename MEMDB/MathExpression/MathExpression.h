@@ -5,6 +5,10 @@
 #include <string>
 #include <list>
 
+//Class for every single piece of math expression that will be stored in a tree
+//Since we have only unary and binary operators, two pointers to another node will be enough
+//There is an initial value and type of the Node, which are just value and type of it's token
+//And return value and type which are the results of it's subtree
 class SyntaxTreeNode {
 public:
     std::string value, type;
@@ -18,6 +22,9 @@ public:
                  std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values);
 };
 
+
+//Class which handles math expressions that are given as a vector of tokens.
+// It creates a syntax tree for the expression and executes these operations
 class SyntaxTree {
 public:
     static std::map<std::string, int> operations_priority;
