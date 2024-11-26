@@ -7,31 +7,25 @@
 #include <memory>
 #include <set>
 
-
 class Column {
 public:
-
     std::string name;
-
     std::string type;
     int max_len;
     std::string default_value;
     std::list<std::string> data;
-
     bool is_unique, is_autoincrement, is_key;
-
 
     Column(std::string &name, std::string &type, std::string &default_value, int max_len, bool is_unique, bool is_autoincrement, bool is_key, std::list<std::string> data);
     Column(std::string &&name, std::string &&type, std::string &&default_value, int max_len, bool is_unique, bool is_autoincrement, bool is_key,  std::list<std::string> &&data);
     Column(const Column &other);
 
-    Column& operator=(const Column& other) // III. copy assignment
-    {
+    Column& operator=(const Column& other){
         if (this == &other)
             return *this;
 
-        Column temp(other); // use the copy constructor
-        std::swap(temp, (*this)); // exchange the underlying resource
+        Column temp(other);
+        std::swap(temp, (*this));
 
         return *this;
     }

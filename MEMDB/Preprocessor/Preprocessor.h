@@ -8,13 +8,8 @@ class Preprocessor {
     std::string error;
 
 public:
-    Preprocessor(std::string &query) {
-        this->source = query;
-        this->ok = true;
-    }
-
+    explicit Preprocessor(std::string &query);
     ~Preprocessor() = default;
-
     PreprocessorResult * Parse();
     PreprocessorResult * Preprocess();
 };

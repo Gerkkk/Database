@@ -1,6 +1,5 @@
 #include "Database.h"
 
-
 using namespace memdb;
 
 void Database::add_table(std::shared_ptr<Table> &x) {
@@ -51,4 +50,55 @@ void Database::print_database() {
     }
 
     std::cout << "============================" << std::endl;
+}
+
+
+DBResult Database::execute(std::string &query) {
+    auto db_res = new DBResult();
+    Preprocessor P = Preprocessor(query);
+    PreprocessorResult *p_res = P.Parse();
+    std::vector<QueryResult> prom_res;
+
+    if (!p_res->is_ok()) {
+        db_res->ok = false;
+        db_res->error = p_res->error;
+        return *db_res;
+    }  else {
+        for (auto it : p_res->data) {
+            QueryResult *qr;
+
+            if (it.commands[0]->type == "select") {
+                SelectQuery sel = SelectQuery(this, it.commands, true);
+                qr = sel.execute();
+            } else if (it.commands[0]->type == "insert") {
+                InsertQuery ins = InsertQuery(this, it.commands, true);
+                qr = ins.execute();
+            } else if (it.commands[0]->type == "delete") {
+                DeleteQuery del = DeleteQuery(this, it.commands, true);
+                qr = del.execute();
+
+            } else if (it.commands[0]->type == "create") {
+                CreateQuery cr = CreateQuery(this, it.commands, true);
+                qr = cr.execute();
+            } else if (it.commands[0]->type == "update") {
+                UpdateQuery upd = UpdateQuery(this, it.commands, true);
+                qr = upd.execute();
+            } else {
+                qr = new QueryResult();
+                qr->ok = false;
+                qr->error = "Executor: Uknown command, which starts with " + it.commands[0]->value;
+            }
+
+            if (!qr->is_ok()) {
+                db_res->error = qr->error;
+                db_res->ok = false;
+                break;
+            } else {
+                prom_res.push_back(*qr);
+            }
+        }
+
+        db_res->data = prom_res;
+        return *db_res;
+    }
 }

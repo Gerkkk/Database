@@ -1,5 +1,10 @@
 #include "Preprocessor.h"
 
+Preprocessor::Preprocessor(std::string &query) {
+    this->source = query;
+    this->ok = true;
+}
+
 PreprocessorResult * Preprocessor::Parse() {
     std::string buf;
     std::vector<std::string> commands;
@@ -20,11 +25,9 @@ PreprocessorResult * Preprocessor::Parse() {
         int q_subq = 0, balance = 0;
         i = 0;
         std::string subq_buf, curq_buf;
-
         std::vector<std::string> temp;
 
         while (i < cur_command.size()) {
-
             if (cur_command[i] == '{') {
                 balance++;
             } else if (cur_command[i] == '}') {
@@ -33,7 +36,6 @@ PreprocessorResult * Preprocessor::Parse() {
                 if (balance == 0) {
                     curq_buf += (" _PREV" + std::to_string(q_subq + 1) + " ");
                     q_subq++;
-
                     temp.push_back(subq_buf);
                     subq_buf = "";
                 }
@@ -76,25 +78,17 @@ PreprocessorResult * Preprocessor::Parse() {
 PreprocessorResult * Preprocessor::Preprocess() {
     std::vector<CommandsLine> res;
 
-    //const std::clock_t c_start = std::clock();
-
     for (std::pair<std::string, bool> cur_query: this->prom_res) {
         std::vector<Token *> cur_tokens;
         std::string buf;
         int i = 0;
         TokenFactory T = TokenFactory();
 
-        //std::cout << cur_query.first.size() << std::endl;
-        const std::clock_t c_start = std::clock();
-
         while (i < cur_query.first.size()) {
-
-
             if (cur_query.first[i] == '\n' || cur_query.first[i] == ' ') {
                 if (!buf.empty()) {
                     Token *r = T.make_token(buf);
 
-                    //std::cout << "! " << buf << std::endl;
                     if (r != nullptr) {
                         cur_tokens.push_back(r);
                     } else {
@@ -135,9 +129,7 @@ PreprocessorResult * Preprocessor::Preprocess() {
                 buf.push_back(cur_query.first[i]);
                 Token *rr = T.make_token(buf);
                 cur_tokens.push_back(rr);
-
                 buf = "";
-
             } else {
                 buf.push_back(cur_query.first[i]);
             }
@@ -171,7 +163,6 @@ PreprocessorResult * Preprocessor::Preprocess() {
     prep_res->ok = this->ok;
     prep_res->error = this->error;
     prep_res->data = res;
-
 
     return prep_res;
 }

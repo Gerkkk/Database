@@ -6,40 +6,26 @@ public:
     bool ok;
     std::string error;
 
-    Result() {
-        error = "";
-        ok = true;
-    }
-
-    std::string get_error() {
-        return this->error;
-    }
-
-    bool is_ok() {
-        return this->ok;
-    }
+    Result();
+    std::string get_error() const;
+    bool is_ok() const;
 
 };
 
 class PreprocessorResult: public Result {
 public:
     std::vector<CommandsLine> data;
-
-    PreprocessorResult(): Result() {
-        this->data;
-    }
+    PreprocessorResult();
 };
 
 class QueryResult: public Result {
 public:
     Table data = Table("Result");
-
-    QueryResult(): Result() {}
+    QueryResult();
 };
 
 class DBResult: public Result {
 public:
     std::vector<QueryResult> data;
-
-    DBResult(): Result() {}
+    DBResult();
 };
