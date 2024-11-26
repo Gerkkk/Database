@@ -162,12 +162,32 @@ namespace memdb {
                             }
                         } else {
                             if (table->columns[table->col_names[i]]->is_unique || table->columns[table->col_names[i]]->is_key || table->columns[table->col_names[i]]->is_autoincrement) {
+                                if (value[i]->type == "string" && value[i]->value.size() > table->columns[table->col_names[i]]->max_len) {
+                                    std::cout << "trying to insert string that is bigger than max len" << std::endl;
+                                    exit(-1);
+                                }
+
+                                if (value[i]->type == "bytes" && ( value[i]->type.size() % 2 != 0 || (value[i]->value.size() - 2) / 2 != table->columns[table->col_names[i]]->max_len)) {
+                                    // size() - 2 because of 0x, len of such string should be even because each byte is coded with 2 symbols
+                                    std::cout << value[i]->type.size() << std::endl;
+                                    std::cout << "Insert query: trying to insert bytes that is bigger or smaller than len for column or has wrong structure" << std::endl;
+                                    exit(-1);
+                                }
+
                                 if (std::count(table->columns[table->col_names[i]]->data.begin(), table->columns[table->col_names[i]]->data.end(), value[i]->value) > 0) {
                                     std::cout << "trying to insert existing value to table with attribute unique/autoincrement/key" << std::endl;
                                     exit(-1);
                                 } else {
                                     table->columns[table->col_names[i]]->data.push_back(value[i]->value);
                                 }
+                            } else if (value[i]->type == "string" && value[i]->value.size() > table->columns[table->col_names[i]]->max_len) {
+                                std::cout << "trying to insert string that is bigger than max len" << std::endl;
+                                exit(-1);
+                            } else if (value[i]->type == "bytes" && ( value[i]->value.size() % 2 != 0 || (value[i]->value.size() - 2) / 2 != table->columns[table->col_names[i]]->max_len)) {
+                                // size() - 2 because of 0x, len of such string should be even because each byte is coded with 2 symbols
+                                std::cout << value[i]->type.size() << std::endl;
+                                std::cout << "Insert query: trying to insert bytes that is bigger or smaller than len for column or has wrong structure" << std::endl;
+                                exit(-1);
                             } else {
                                 table->columns[table->col_names[i]]->data.push_back(value[i]->value);
                             }
@@ -693,6 +713,12 @@ namespace memdb {
                                 //std::cout << st_res.first << " " << st_res.second << std::endl;
                                 if (st_res.first != table->columns[assignment.col_name]->type) {
                                     std::cout << "Update: Update with wrong type" << std::endl;
+                                } else if (st_res.first == "string" && st_res.second.size() > table->columns[assignment.col_name]->max_len) {
+                                    std::cout << "Update query: trying to insert string that is bigger than max len" << std::endl;
+                                    exit(-1);
+                                } else if (st_res.first == "bytes" && (st_res.second.size() % 2 != 0 || (st_res.second.size() - 2) / 2 != table->columns[assignment.col_name]->max_len)) {
+                                    std::cout << "Update query: trying to insert bytes that is bigger or smaller than len for column or bytes have wrong structure" << std::endl;
+                                    exit(-1);
                                 } else {
                                     (*cv[table->name][assignment.col_name]) = st_res.second;
                                 }

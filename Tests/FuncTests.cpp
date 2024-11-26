@@ -60,9 +60,8 @@ TEST(QueryTests, Test1) {
     Database db;
 
     //Checking column flags. Also checking that names of tables and columns are sensitive to register
-    std::string s = "create table People ((unique) name : string[32] = noname, Age : int32 = 18, (autoincrement) id : int32 = -2, is_student : bool = false);";
+    std::string s = "create table People ((unique) name : string[10] = noname, Age : int32 = 18, (autoincrement) id : int32 = -2, is_student : bool = false);";
     db.execute(s);
-
     //Checking correct work of unique and autoincrement, types
     s = "insert (\"Alex\", 19, , true) to People;";
     db.execute(s);
@@ -137,6 +136,11 @@ TEST(QueryTests, Test1) {
 
     //Update with simple condition. Checking that update does not change table size
     s = "update People set is_student = true where Age < 40;";
+    dbres = db.execute(s);
+    EXPECT_EQ(db.tables["People"]->size, 6);
+
+    //Update with simple condition. Checking that update does not change table size
+    s = "update People set name = \"aaaa\" where Age < 40;";
     dbres = db.execute(s);
     EXPECT_EQ(db.tables["People"]->size, 6);
 
@@ -385,4 +389,46 @@ TEST(QueryTests, Test4) {
         EXPECT_EQ(db.tables[it.first]->size, db1.tables[it.first]->size);
         EXPECT_EQ(db.tables[it.first]->columns.size(), db1.tables[it.first]->columns.size());
     }
+}
+
+
+TEST(QueryTests, Test5) {
+
+    //bytes
+    Database db;
+
+    //Checking column flags. Also checking that names of tables and columns are sensitive to register
+    std::string s = "create table Users ((autoincrement, key) id : int32 = 0, login : string[32] = \"unnamed\", password : bytes[5] = 0x0000000000);";
+    DBResult db1 = db.execute(s);
+
+
+    //->Bad, to many commas. Change this
+    s = "insert ( , \"vasya52\", 0x11aabbccdd) to Users;";
+    db.execute(s);
+
+    s = "insert ( , \"oleg228\", 0x22eeb34c52) to Users;";
+    db.execute(s);
+
+    s = "insert ( , \"vanyabruh\", 0x0000001234) to Users;";
+    db.execute(s);
+
+    s = "select login from Users where password = 0x0000001234;";
+    DBResult dbres = db.execute(s);
+    auto sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 1);
+
+    s = "update Users set password = 0x0000000000 where password < 0x00f0000000;";
+    dbres = db.execute(s);
+    EXPECT_EQ(db.tables["Users"]->size, 3);
+
+    s = "select login from Users where password = 0x0000000000;";
+    dbres = db.execute(s);
+    sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 1);
+
+    s = "select login from Users where |password| = 5;";
+    dbres = db.execute(s);
+    sz = dbres.data[0].data.size;
+    EXPECT_EQ(sz, 3);
+
 }

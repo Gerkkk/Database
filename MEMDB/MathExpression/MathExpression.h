@@ -19,6 +19,16 @@ public:
         right_son = nullptr;
     }
 
+    ~SyntaxTreeNode() {
+        if (left_son != nullptr) {
+            delete left_son;
+        }
+
+        if (right_son != nullptr) {
+            delete right_son;
+        }
+    }
+
     void execute(std::map<std::string, std::map<std::string, std::string>> &column_types, std::map<std::string, std::map<std::string, std::list<std::string>::iterator>> &column_values) {
         if (left_son) {
             left_son->execute(column_types, column_values);
@@ -55,6 +65,9 @@ public:
         } else if (type == "string") {
             ret_value = value;
             ret_type = "string";
+        } else if (type == "bytes") {
+            ret_value = value;
+            ret_type = "bytes";
         } else if (type == "true") {
             ret_value = value;
             ret_type = "bool";
@@ -167,7 +180,7 @@ public:
                 } else {
                     ret_value = "false";
                 }
-            } else if (left_son->ret_type == "string") {
+            } else if (left_son->ret_type == "string" || left_son->ret_type == "bytes") {
                 if (left_son->ret_value.compare(right_son->ret_value) == 1) {
                     ret_value = "true";
                 } else {
@@ -197,7 +210,7 @@ public:
                 } else {
                     ret_value = "false";
                 }
-            } else if (left_son->ret_type == "string") {
+            } else if (left_son->ret_type == "string" || left_son->ret_type == "bytes") {
                 if (left_son->ret_value.compare(right_son->ret_value) >= 0) {
                     ret_value = "true";
                 } else {
@@ -227,7 +240,7 @@ public:
                 } else {
                     ret_value = "false";
                 }
-            } else if (left_son->ret_type == "string") {
+            } else if (left_son->ret_type == "string" || left_son->ret_type == "bytes") {
                 if (left_son->ret_value.compare(right_son->ret_value) < 0) {
                     ret_value = "true";
                 } else {
@@ -257,7 +270,7 @@ public:
                 } else {
                     ret_value = "false";
                 }
-            } else if (left_son->ret_type == "string") {
+            } else if (left_son->ret_type == "string" || left_son->ret_type == "bytes") {
                 if (left_son->ret_value.compare(right_son->ret_value) <= 0) {
                     ret_value = "true";
                 } else {
@@ -330,7 +343,6 @@ public:
                 std::cout << "Logical or should have 2 operands" << std::endl;
                 exit(-1);
             }
-            std::cout << "OOPP " <<  ret_value << std::endl;
 
             if (left_son->ret_type != right_son->ret_type) {
                 std::cout << "Logical or should have 2 operands of type bool" << std::endl;
@@ -338,7 +350,7 @@ public:
             } else {
                 ret_type = "bool";
                 if (left_son->ret_type == "bool") {
-                    ret_value = ((left_son->ret_value == "true") | (right_son->ret_value == "true")) ? "true" : "false";
+                    ret_value = ((left_son->ret_value == "true") || (right_son->ret_value == "true")) ? "true" : "false";
                 } else {
                     std::cout << "Logical or should have 2 operands of type bool" << std::endl;
                     exit(-1);
@@ -385,12 +397,17 @@ public:
                 exit(-1);
             } else {
                 if ((*column_types.begin()).second.find(value) != (*column_types.begin()).second.end()) {
-                    if ((*column_types.begin()).second[value] != "string") {
-                        std::cout << "We only can take module of a string" << std::endl;
+                    if ((*column_types.begin()).second[value] != "string" && (*column_types.begin()).second[value] != "bytes") {
+                        std::cout << "We only can take module of a string or bytes" << std::endl;
                         exit(-1);
                     } else {
                         ret_type = "int32";
-                        ret_value = std::to_string((*(*column_values.begin()).second[value]).size());
+                        if ((*column_types.begin()).second[value] == "string") {
+                            ret_value = std::to_string((*(*column_values.begin()).second[value]).size());
+                        } else {
+                            ret_value = std::to_string(((*(*column_values.begin()).second[value]).size() - 2) / 2);
+                        }
+
                     }
                 } else {
                     std::cout << "No column with name " << value << " in table " << (*column_types.begin()).first << std::endl;
@@ -423,6 +440,7 @@ public:
         return std::make_pair(head->ret_type, head->ret_value);
     }
 
+    ~SyntaxTree() = default;
 private:
     SyntaxTreeNode *build_tree(std::vector<Token *> expr) {
 //        std::cout << "NODE: ";

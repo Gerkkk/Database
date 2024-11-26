@@ -30,8 +30,8 @@ TokenFactory::TokenFactory(){
             {R"([Oo][Nn])", "on"},
             {R"([Tt][Oo])", "to"},
             {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"([0][x][0-9a-f]+[,]?)", "bytes"},
             {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
-            {R"([0][x][0-9a-f]+[,]?)", "bin"},
             {R"([|][A-Za-z]*[|])", "module"},
             {R"([Ss][Ee][Tt])", "set"},//26
             {R"([Kk][Ee][Yy][,]?)", "key"},
@@ -39,16 +39,16 @@ TokenFactory::TokenFactory(){
             {R"([Jj][Oo][Ii][Nn])", "join"},
             {R"([t][r][u][e][,]?)", "true"},
             {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"([0][x][0-9a-f]+[,]?)", "bytes"},
             {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
-            {R"([0][x][0-9a-f]+[,]?)", "bin"},
             {R"([|][A-Za-z]*[|])", "module"},
             {R"([f][a][l][s][e][,]?)", "false"},//35
             {R"([Ii][Nn][Dd][Ee][Xx])", "index"},
             {R"([Ww][Hh][Ee][Rr][Ee])", "where"},
             {R"([Tt][Aa][Bb][Ll][Ee])", "table"},
             {R"([+-]?[0-9]+[,]?)", "int32"},
+            {R"([0][x][0-9a-f]+[,]?)", "bytes"},
             {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
-            {R"([0][x][0-9a-f]+[,]?)", "bin"},
             {R"([|][A-Za-z]*[|])", "module"},
             {R"([Uu][Pp][Dd][Aa][Tt][Ee])", "update"},//43
             {R"([Dd][Ee][Ll][Ee][Tt][Ee])", "delete"},
@@ -58,8 +58,8 @@ TokenFactory::TokenFactory(){
             {R"([Ss][Ee][Ll][Ee][Cc][Tt])", "select"},
             //constants and types
             {R"([+-]?[0-9]+[,]?)", "int32"},//49
+            {R"([0][x][0-9a-f]+[,]?)", "bytes"},
             {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
-            {R"([0][x][0-9a-f]+[,]?)", "bin"},
             {R"([Aa][Uu][Tt][Oo][Ii][Nn][Cc][Rr][Ee][Mm][Ee][Nn][Tt][,]?)", "autoincrement"},
             {R"([|][A-Za-z]*[|])", "module"}
     };
@@ -131,7 +131,8 @@ Token * TokenFactory::make_name(std::string &x) {
 
     if (std::regex_match(x, std::regex(R"([s][t][r][i][n][g][0-9]*\[[0-9]+\][,:]?)"))
         || std::regex_match(x, std::regex(R"([i][n][t][3][2])"))
-           || std::regex_match(x, std::regex(R"([b][o][o][l])")) ) {
+           || std::regex_match(x, std::regex(R"([b][o][o][l])"))
+           || std::regex_match(x, std::regex(R"([b][y][t][e][s]\[[0-9]+\][,:]?)"))) {
         ret_type = "type_name";
         ret_val = x;
     } else if (std::regex_match(x, std::regex(R"([_]?[a-zA-Z_]+[0-9]*[,:]?)"))) {
