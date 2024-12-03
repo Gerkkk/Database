@@ -130,6 +130,7 @@ public:
     void create_index(std::string &s);
     void save_to_file(std::ofstream &&out);
     void load_from_file(std::ifstream &&in);
+    void save_to_file_readable(std::ofstream &&out);
 
     std::map<std::string, std::set<std::pair<std::string, std::vector<std::string>>>> indexes;
     size_t size;

@@ -46,6 +46,7 @@ TokenFactory::TokenFactory(){
             {R"([Ii][Nn][Dd][Ee][Xx])", "index"},
             {R"([Ww][Hh][Ee][Rr][Ee])", "where"},
             {R"([Tt][Aa][Bb][Ll][Ee])", "table"},
+            {R"([t][r][u][e][,]?)", "true"},
             {R"([+-]?[0-9]+[,]?)", "int32"},
             {R"([0][x][0-9a-f]+[,]?)", "bytes"},
             {R"("[\a-zA-Z0-9_]*"[,]?)", "string"},
@@ -56,6 +57,7 @@ TokenFactory::TokenFactory(){
             {R"([Uu][Nn][Ii][Qq][Uu][Ee][,]?)", "unique"},
             {R"([Ii][Nn][Ss][Ee][Rr][Tt])", "insert"},
             {R"([Ss][Ee][Ll][Ee][Cc][Tt])", "select"},
+            {R"([f][a][l][s][e][,]?)", "false"},
             //constants and types
             {R"([+-]?[0-9]+[,]?)", "int32"},//49
             {R"([0][x][0-9a-f]+[,]?)", "bytes"},

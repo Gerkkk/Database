@@ -34,4 +34,6 @@ class DBResult: public Result {
 public:
     std::vector<QueryResult> data;
     DBResult();
+
+    void save_to_file_readable(std::ofstream &&out);
 };

@@ -38,7 +38,8 @@ add_executable(Test Tests/FuncTests.cpp
                 MEMDB/Database/Insert.cpp
                 MEMDB/Database/Select.cpp
                 MEMDB/Database/Update.cpp
-                MEMDB/Database/Delete.cpp)
+                MEMDB/Database/Delete.cpp
+                MEMDB/Database/Join.cpp)
 
 target_link_libraries(Test GTest::gtest_main)
 
@@ -60,11 +61,9 @@ add_executable(main main.cpp
         MEMDB/Table/Table.cpp
         MEMDB/Database/Database.h
         MEMDB/Database/Database.cpp
-        Tests/FuncTests.cpp
-        MEMDB/MathExpression/SyntaxTreeNode.cpp
-        MEMDB/MathExpression/SyntaxTree.cpp
         MEMDB/Database/Create.cpp
         MEMDB/Database/Insert.cpp
+        MEMDB/Database/Select.cpp
         MEMDB/Database/Update.cpp
         MEMDB/Database/Delete.cpp
-        MEMDB/Database/Select.cpp)
+        MEMDB/Database/Join.cpp)

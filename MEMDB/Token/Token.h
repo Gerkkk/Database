@@ -29,15 +29,15 @@ private:
 //Class for one query as a tuple of tokens. Needed for two things: handling several queries in one execute and handling nested queries
 struct CommandsLine {
 public:
-    bool flag;
+    int flag;
     std::vector<Token *> commands;
 
     CommandsLine() {
         this->commands = {};
-        this->flag = false;
+        this->flag = 0;
     }
 
-    CommandsLine(std::vector<Token *> &commands, bool flag) {
+    CommandsLine(std::vector<Token *> &commands, int flag) {
         this->commands = commands;
         this->flag = flag;
     }

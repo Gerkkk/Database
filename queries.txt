@@ -1,0 +1,17 @@
+create table Employees ((autoincrement, key) id : int32 = 0, name : string[32] = "empty_name", Age : int32 = 18, department_id : int32 = -1);
+create table Departments ((key) id : int32 = 0, name : string[32] = "headquarters", city : string[50] = "Moscow");
+insert ( , Ivan,  ,  ,) to Employees;
+insert ( , Denis,  ,  ,) to Employees;
+insert ( , Maria,  ,  ,) to Employees;
+insert ( , Janet,  ,  ,) to Employees;
+insert ( , Samwell,  ,  ,) to Employees;
+insert ( , Mike, 34, 5) to Employees;
+insert ( , Tom, 23, 5) to Employees;
+insert ( , Leo, 46, 5) to Employees;
+insert ( , Howard, 31, 5) to Employees;
+insert ( , Constance, 29, 5) to Employees;
+insert ( , Constance, 19, 3) to Employees;
+insert ( , George, 20, 3) to Employees;
+insert (-1, , ,) to Departments;
+insert (5, PR, Berlin) to Departments;
+insert (3, IT, Paris) to Departments;

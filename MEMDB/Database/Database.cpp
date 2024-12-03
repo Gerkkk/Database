@@ -37,7 +37,7 @@ void Database::load_from_file(std::ifstream &&in) {
             add_table(cur_table);
         }
     } else {
-        std::cout << "Trying to write to closed file" << std::endl;
+        std::cout << "Trying to read from closed file" << std::endl;
         exit(-1);
     }
 }
@@ -64,6 +64,7 @@ DBResult Database::execute(std::string &query) {
     Preprocessor P = Preprocessor(query);
     PreprocessorResult *p_res = P.Parse();
     std::vector<QueryResult> prom_res;
+    this->help_tables = {};
 
     if (!p_res->is_ok()) {
         db_res->ok = false;
@@ -72,6 +73,11 @@ DBResult Database::execute(std::string &query) {
     }  else {
         for (auto it : p_res->data) {
             QueryResult *qr;
+
+//            for (auto it1: it.commands) {
+//                std::cout << it1->value << " ";
+//            }
+//            std::cout << std::endl;
 
             if (it.commands[0]->type == "select") {
                 SelectQuery sel = SelectQuery(this, it.commands, true);
@@ -88,22 +94,54 @@ DBResult Database::execute(std::string &query) {
             } else if (it.commands[0]->type == "update") {
                 UpdateQuery upd = UpdateQuery(this, it.commands, true);
                 qr = upd.execute();
-            } else {
+            } else if (it.commands.size() > 1 && it.commands[1]->type == "join") {
+                JoinQuery jqd = JoinQuery(this, it.commands, true);
+                qr = jqd.execute();
+            }  else {
                 qr = new QueryResult();
                 qr->ok = false;
                 qr->error = "Executor: Uknown command, which starts with " + it.commands[0]->value;
             }
 
+//            qr->data.print_table();
+//            std::cout << "^^^^^?????!!!!!!!" << it.flag << std::endl;
+
             if (!qr->is_ok()) {
                 db_res->error = qr->error;
                 db_res->ok = false;
                 break;
-            } else {
+            } else if (it.flag == 0){
                 prom_res.push_back(*qr);
+            } else {
+                std::string temp = "_PREV" + std::to_string(it.flag);
+                this->help_tables.insert(std::make_pair(temp, std::make_shared<Table>(qr->data)));
             }
         }
 
         db_res->data = prom_res;
         return *db_res;
+    }
+}
+
+DBResult Database::execute(std::ifstream &&in) {
+    if(in.is_open()) {
+        std::string query, all = "", newall = "";
+
+        while (std::getline(in, query)) {
+            newall = all + query;
+            all = newall;
+            if(!all.empty() && all[all.size() - 1] != ';') {
+                all.pop_back();
+                all.push_back(' ');
+            }
+            newall = "";
+            query = "";
+
+        }
+
+        return this->execute(all);
+    } else {
+        std::cout << "Trying to read from closed file" << std::endl;
+        exit(-1);
     }
 }

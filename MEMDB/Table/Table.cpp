@@ -117,3 +117,40 @@ void Table::load_from_file(std::ifstream &&in) {
         exit(-1);
     }
 }
+
+void Table::save_to_file_readable(std::ofstream &&out) {
+    if(out.is_open()) {
+        out << this->name << " " << this->size << " " << this->col_names.size() << std::endl;
+
+        out << "Column names:" << " ";
+        for(auto it : col_names) {
+            out << columns[it]->name << " ";
+        }
+        out << std::endl;
+
+        out << "Column types:" << " ";
+        for(auto it : col_names) {
+            out << columns[it]->type << " ";
+        }
+        out << std::endl;
+
+        out << "Columns:" << std::endl;
+
+        std::map<std::string, std::list<std::string>::iterator> columns_map;
+        for(auto it : this->col_names) {
+            columns_map[it] = this->columns[it]->data.begin();
+        }
+
+        for (int i = 0; i < this->size; i++) {
+            for (auto it: this->col_names) {
+                out << *columns_map[it] << " ";
+                columns_map[it]++;
+            }
+            out << std::endl;
+        }
+
+    } else {
+        std::cout << "Trying to write to closed file" << std::endl;
+        exit(-1);
+    }
+}

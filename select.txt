@@ -1,0 +1,2 @@
+select Employees_name from {Employees join Departments on Employees.department_id = Departments.id} where Departments_city = "Berlin";
+select name, Age from Employees where true;

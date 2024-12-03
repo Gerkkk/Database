@@ -1,0 +1,29 @@
+The query was performed successfully
+====================Result0====================
+Result 5 1
+Column names: Employees_name 
+Column types: string 
+Columns:
+Mike 
+Tom 
+Leo 
+Howard 
+Constance 
+====================Result1====================
+Result 12 2
+Column names: name Age 
+Column types: string int32 
+Columns:
+Ivan 18 
+Denis 18 
+Maria 18 
+Janet 18 
+Samwell 18 
+Mike 34 
+Tom 23 
+Leo 46 
+Howard 31 
+Constance 29 
+Constance 19 
+George 20 
+==============================================

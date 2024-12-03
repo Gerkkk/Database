@@ -16,16 +16,21 @@ namespace memdb {
     public:
         std::vector<std::string> table_names;
         std::map<std::string, std::shared_ptr<Table>> tables;
+        std::map<std::string, std::shared_ptr<Table>> help_tables;
 
         Database() = default;
+        ~Database() = default;
 
         void add_table(std::shared_ptr<Table> &x);
         void save_to_file(std::ofstream &&out);
         void load_from_file(std::ifstream &&in);
         void print_database();
 
+        DBResult execute(std::ifstream &&in);
+
         DBResult execute(std::string &query);
 
+    private:
         //Base class for queries. The main property is the execute method.
         //in fact, we also have to save here stack of recent results for subqueries.
         //But we will deal with it later, when we will implement subqueries.
@@ -132,8 +137,17 @@ namespace memdb {
             QueryResult *execute () override;
         };
 
+        class JoinQuery : public Query {
+        public:
+            bool is_ok;
+            std::vector<Token *> tables;
+            std::vector<Token *> conditions;
+            std::string err;
 
-        ~Database() = default;
+            JoinQuery(Database *db, std::vector<Token *> &s, bool need);
+            QueryResult *execute () override;
+        };
+
     };
 }
 

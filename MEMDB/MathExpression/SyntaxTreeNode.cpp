@@ -383,6 +383,49 @@ void SyntaxTreeNode::execute(std::map<std::string, std::map<std::string, std::st
 
             ret_value = (*(*column_values.begin()).second[value]);
         }
+    } else if (type == "complex_name") {
+        if (column_types.size() == 0) {
+            std::cout << "Not enough tables for execute" << std::endl;
+            exit(-1);
+        } else {
+            std::string t_name, c_name, cur_value;
+
+            for (auto it : value) {
+                if (it != '.') {
+                    cur_value.push_back(it);
+                } else {
+                    cur_value.push_back('_');
+                }
+            }
+
+            int i = 0;
+            while (i < value.size() && value[i] != '.') {
+                t_name.push_back(value[i]);
+                i++;
+            }
+
+            int fail = 1;
+
+            for (auto it : column_types) {
+                if(it.first == t_name) {
+                    if (column_values[t_name].find(cur_value) != column_values[t_name].end()) {
+                        ret_type = it.second[cur_value];
+                    } else {
+                        std::cout << "No column with name " << cur_value << " in table " << it.first << std::endl;
+                        exit(-1);
+                    }
+
+                    ret_value = (*column_values[t_name][cur_value]);
+                    fail = 0;
+                    break;
+                }
+            }
+
+            if (fail == 1) {
+                std::cout << "No table with name " << t_name << " in database"  << std::endl;
+                exit(-1);
+            }
+        }
     } else if (type == "module") {
         if (column_types.size() == 0) {
             std::cout << "Not enough tables for execute" << std::endl;

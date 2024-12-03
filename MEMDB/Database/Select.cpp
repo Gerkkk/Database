@@ -57,12 +57,37 @@ QueryResult * Database::SelectQuery::execute() {
         return res;
     }
 
-    if (db->tables.find(source->value) == db->tables.end()) {
+    std::shared_ptr<Table> table;
+
+//    std::cout << "======="<< std::endl;
+//    std::cout << db->help_tables.size() << std::endl;
+//    for(auto it : db->help_tables) {
+//        std::cout << it.first << " ";
+//    }
+//    std::cout << std::endl;
+//
+//    std::cout << db->tables.size() << std::endl;
+//    for(auto it : db->tables) {
+//        std::cout << it.first << " ";
+//    }
+//    std::cout << std::endl;
+//    std::cout << "======="<< std::endl;
+
+    if (db->tables.find(source->value) == db->tables.end() && db->help_tables.find(source->value) == db->help_tables.end()) {
         res->ok = false;
         res->error = "Select query: No such table in database";
+        //std::cout << "AAAAA" << std::endl;
         return res;
     } else {
-        auto table = db->tables[source->value];
+        //std::cout << "! " << source->value << std::endl;
+        if (db->tables.find(source->value) == db->tables.end()) {
+            //std::cout << "took " << source->value << std::endl;
+            table = db->help_tables[source->value];
+
+        } else {
+            //std::cout << "took " << source->value <<" from tables" << std::endl;
+            table = db->tables[source->value];
+        }
 
         std::map<std::string, std::list<std::string>::iterator> columns_map;
         std::map<std::string, std::string> column_types;
@@ -71,8 +96,8 @@ QueryResult * Database::SelectQuery::execute() {
             auto pr_col = table->columns[it->value];
 
             auto new_col = std::shared_ptr<Column>(new Column(pr_col->name, pr_col->type, pr_col->default_value,
-                                                                pr_col->max_len, pr_col->is_unique, pr_col->is_autoincrement,
-                                                                pr_col->is_key, {}));
+                                                              pr_col->max_len, pr_col->is_unique, pr_col->is_autoincrement,
+                                                              pr_col->is_key, {}));
             res->data.add_column(new_col);
         }
 
@@ -107,6 +132,9 @@ QueryResult * Database::SelectQuery::execute() {
 
             counter++;
         }
+
+
     }
+    //std::cout << "OK" << std::endl;
     return res;
 }

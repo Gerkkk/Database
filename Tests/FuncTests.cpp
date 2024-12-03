@@ -135,7 +135,7 @@ TEST(QueryTests, Test1) {
     EXPECT_EQ(db.tables["People"]->size, 6);
 
     //Update with simple condition. Checking that update does not change table size
-    s = "update People set is_student = true where Age < 40;";
+    s = "update People set is_student = true, name = \"LOL\" where Age < 40;";
     dbres = db.execute(s);
     EXPECT_EQ(db.tables["People"]->size, 6);
 
@@ -249,6 +249,11 @@ TEST(QueryTests, Test2) {
     dbres = db.execute(s);
     sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 6);
+
+    //Update with simple condition. Checking that update does not change table size
+    s = "update Employees set department_id = 0, Age = 100 where department_id = -1;";
+    db.execute(s);
+    EXPECT_EQ(db.tables["Employees"]->size, 12);
 
     //Update with simple condition. Checking that update does not change table size
     s = "update Employees set department_id = 0 where department_id = -1;";
@@ -393,7 +398,6 @@ TEST(QueryTests, Test4) {
 
 
 TEST(QueryTests, Test5) {
-
     //bytes
     Database db;
 
@@ -430,5 +434,30 @@ TEST(QueryTests, Test5) {
     dbres = db.execute(s);
     sz = dbres.data[0].data.size;
     EXPECT_EQ(sz, 3);
+}
 
+TEST(QueryTests, Test6) {
+
+    //Serialization
+    Database db;
+
+    //Checking column flags. Also checking that names of tables and columns are sensitive to register
+    std::string s = "create table Employees ((autoincrement, key) id : int32 = 0, name : string[32] = \"empty_name\", Age : int32 = 18, department_id : int32 = -1);";
+    db.execute(s);
+    s = "create table Departments ((key) id : int32 = 0, name : string[32] = \"headquarters\", city : string[50] = \"Moscow\");";
+    db.execute(s);
+
+    //->Bad, to many commas. Change this
+    s = "insert ( , Ivan,  ,  ,) to Employees; insert ( , Denis,  ,  ,) to Employees; insert ( , Maria,  ,  ,) to Employees; insert ( , Janet,  ,  ,) to Employees; insert ( , Samwel,  ,  ,) to Employees; insert ( , Mike, 34, 5) to Employees; insert ( , Tom, 23, 5) to Employees; insert ( , Leo, 46, 5) to Employees; insert ( , Howard, 31, 5) to Employees; insert ( , Constance, 29, 5) to Employees; insert ( , Constance, 19, 3) to Employees; insert ( , George, 20, 3) to Employees; insert (-1, , ,) to Departments; insert (5, PR, Berlin) to Departments; insert (3, IT, Paris) to Departments;";
+    db.execute(s);
+
+
+    s = "select Employees_name from {Employees join Departments on Employees.department_id = Departments.id} where Departments_city = \"Berlin\";";
+    DBResult dbr = db.execute(s);
+    EXPECT_EQ(dbr.data[0].data.size, 5);
+
+    s = "select Employees_name, Departments_city from {select Employees_id, Employees_name, Employees_Age, Departments_city from {Employees join Departments on Employees.department_id = Departments.id} where Departments_city = \"Berlin\"} where true;";
+    dbr = db.execute(s);
+    dbr.data[0].data.print_table();
+    EXPECT_EQ(dbr.data[0].data.size, 5);
 }
